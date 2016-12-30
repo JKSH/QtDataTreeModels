@@ -14,24 +14,16 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 	m_headers = QStringList{"<Structure>", "<Scalar>", "str1", "str2"};
 }
 
-/*
 QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-
-	qDebug() << "JsonTreeModel::headerData()" << section << orientation << role;
+//	qDebug() << "JsonTreeModel::headerData()" << section << orientation << role;
 	Q_UNUSED(role);
-	if (orientation == Qt::Horizontal)
-	{
-		// TODO: Do something
-	}
 
-	// TODO: Differentiate between row and column headers
-	if (section < m_headers.count())
+	if (role == Qt::DisplayRole && orientation == Qt::Horizontal && section < m_headers.count())
 		return m_headers[section];
 
-	return QVariant();
+	return QAbstractItemModel::headerData(section, orientation, role);
 }
-*/
 
 QModelIndex nullIndex(const QString& reason)
 {

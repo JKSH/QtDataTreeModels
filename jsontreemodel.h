@@ -158,7 +158,7 @@ public:
 	~JsonTreeModel(){}
 
 	// Header:
-//	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
 	// Basic functionality:
 	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
