@@ -119,8 +119,12 @@ public:
 
 		if (isScalar())
 			return m_value.toVariant();
-		if (isObject())
+
+		// NOTE: Name will only be displayed in the <Structure> column
+		if (isObject() || isArray())
 			return m_name; // TODO: Do this differently?
+
+		// TODO: Check if the node can even be anything other than Object, Array, or Scalar
 		return QVariant();
 	}
 
