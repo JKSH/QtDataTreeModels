@@ -22,6 +22,22 @@ Widget::Widget(QWidget *parent) :
 		QJsonObject{
 			{"str1", "Scooby"},
 			{"str2", "Doo"}
+		},
+		QJsonArray{
+			QJsonObject{
+				{"obj1", QJsonObject{
+						{"str1", "So"},
+						{"str2", "Long"}
+					}
+				},
+				{"obj2", QJsonObject{
+						{"str1", "Fare"},
+						{"str2", "Well"}
+					}
+				}
+			},
+			"Yee",
+			"Haw"
 		}
 	};
 //*/
