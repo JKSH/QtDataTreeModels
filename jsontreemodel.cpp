@@ -17,7 +17,6 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 //	qDebug() << "JsonTreeModel::headerData()" << section << orientation << role;
-	Q_UNUSED(role);
 
 	if (role == Qt::DisplayRole && orientation == Qt::Horizontal && section < m_headers.count())
 		return m_headers[section];
@@ -189,6 +188,8 @@ int JsonTreeModel::rowCount(const QModelIndex& parent) const
 
 int JsonTreeModel::columnCount(const QModelIndex& parent) const
 {
+	Q_UNUSED(parent);
+
 //	qDebug() << "JsonTreeModel::columnCount()" << parent;
 
 	// ASSUMPTION: The headers list includes Struct and Scalar columns
@@ -214,6 +215,8 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 			return QVariant();
 		}
 //		qDebug() << "\tReturning display data!" << node->displayData();
+
+		// TODO: Do data display logic here (and remove displayData())? That would require doing the same gymnastics as index() though
 		return node->displayData();
 	}
 
