@@ -28,9 +28,17 @@ QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int
 QModelIndex nullIndex(const QString& reason)
 {
 	if (!reason.isEmpty())
-		qDebug() << "\tNULL INDEX:" << reason;
+		qDebug() << "\tCreating NULL index:" << reason;
 
 	return QModelIndex();
+}
+
+QModelIndex JsonTreeModel::blankIndex(int row, int column, const JsonTreeModelNode* parentNode, const QString& reason) const
+{
+	if (!reason.isEmpty())
+		qDebug() << "\tCreating index for BLANK cell:" << reason;
+
+	return createIndex(row, column, parentNode->blank());
 }
 
 QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent) const
@@ -78,7 +86,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 			{
 				qDebug() << "\tCreating blank index for named scalar in core column";
 //				return nullIndex(); // This row only contains Named Scalars
-				return createIndex(row, column, parentNode->blank());
+				return blankIndex(row, column, parentNode, "Name scalar in core column");
 			}
 
 			auto childNode = parentNode->childAt(rMod);
@@ -88,7 +96,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 				return createIndex(row, column, childNode);
 			}
 //			return nullIndex();
-			return createIndex(row, column, parentNode->blank());
+			return blankIndex(row, column, parentNode, "Not a structure");
 		}
 
 		// Not looking for the struct column. Move along.
@@ -102,7 +110,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 		{
 			if (rMod == -1)
 //				return nullIndex(); // This row only contains Named Scalars
-				return createIndex(row, column, parentNode->blank());
+				return blankIndex(row, column, parentNode, "?!!");
 
 			// NOTE: Only Arrays can have Unnamed Scalar elements
 			// TODO: Support cases where the root value is a Scalar
@@ -111,7 +119,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 				auto childNode = parentNode->childAt(row);
 				if (childNode == nullptr || !childNode->isScalar()) // Short-circuit
 //					return nullIndex(); // TODO: Return special value to represent Undefined?
-					return createIndex(row, column, parentNode->blank());
+					return blankIndex(row, column, parentNode, "Not a scalar");
 
 				qDebug() << "\tCreating valid index for" << row << column << childNode;
 				return createIndex(row, column, childNode);
@@ -144,7 +152,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 
 	qDebug() << "\tBO JIO!!!" << rMod << cMod;
 	// None of the above. There's nothing here
-	return createIndex(row, column, parentNode->blank());
+	return blankIndex(row, column, parentNode, "There's nothing here.");
 //	return QModelIndex(); // Using an invalid index makes highlighting not work for that row...
 }
 

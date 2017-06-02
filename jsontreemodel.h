@@ -73,9 +73,9 @@ public:
 		default: break;
 		}
 
-		qDebug() << "Done:" << m_value;
-		qDebug() << "Named Scalars:" << m_namedScalarMap;
-		qDebug() << "Children:" << m_childList << '\n';
+		qDebug() << "Node created for" << m_value;
+		qDebug() << "\tNode's named scalars:" << m_namedScalarMap;
+		qDebug() << "\tNode's children:     " << m_childList << '\n';
 	}
 
 	~JsonTreeModelNode()
@@ -187,6 +187,8 @@ public:
 
 		// TODO: Emit the relevant signals
 	}
+
+	QModelIndex blankIndex(int row, int column, const JsonTreeModelNode* parentNode, const QString& reason = QString()) const;
 
 private:
 	JsonTreeModelNode* m_rootNode;
