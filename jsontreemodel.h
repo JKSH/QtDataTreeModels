@@ -11,136 +11,123 @@
 class JsonTreeModelNode
 {
 public:
+	enum Type {
+		Scalar,
+		Structure
+	};
+
 	JsonTreeModelNode(const QJsonValue& value, JsonTreeModelNode* parent, const QString& name = QString()) :
-		m_value(value),
 		m_parent(parent),
-		m_undefinedChild(nullptr),
-		m_name(name) // TODO: Remove this? Perhaps the parent should keep track of the names, since it already keeps a map
+		m_scalarValue(value),
+		m_name(name), // TODO: Remove this? Perhaps the parent should keep track of the names, since it already keeps a map
+		m_type(Scalar) // TODO: Use subclassing and overridden function to report type
 	{
-		qDebug() << "Creating node for" << value << "...";
+		qDebug() << "Creating Scalar row for" << value;
+	}
 
-		switch (value.type())
+	JsonTreeModelNode(const QJsonArray& arr, JsonTreeModelNode* parent, const QString& name = QString()) :
+		m_parent(parent),
+		m_name(name),
+		m_type(Structure)
+	{
+		qDebug() << "Creating Array row for" << arr;
+
+		JsonTreeModelNode* childNode;
+		for (int i = 0; i < arr.count(); ++i)
 		{
-		case QJsonValue::Null:
-		case QJsonValue::Bool:
-		case QJsonValue::Double:
-		case QJsonValue::String:
-			break;
+			const auto& child = arr[i];
+//			m_childList << new JsonTreeModelNode(arr[i], this, QString::number(i)); // TODO: Let the model manage the number, not the node itself
 
-		case QJsonValue::Array:
+			switch (child.type())
 			{
-/*
-				for (const auto& child : value.toArray())
-					m_childList << new JsonTreeModelNode(child, this);
+			case QJsonValue::Null:
+			case QJsonValue::Bool:
+			case QJsonValue::Double:
+			case QJsonValue::String:
+				childNode = new JsonTreeModelNode(child, this, QString::number(i));
 				break;
-*/
-				auto arr = value.toArray();
-				for (int i = 0; i < arr.count(); ++i)
-					m_childList << new JsonTreeModelNode(arr[i], this, QString::number(i)); // TODO: Let the model manage the number, not the node itself
 
-				m_undefinedChild = new JsonTreeModelNode(QJsonValue(), this); // TODO: Only create if the node has any sub-items
+			case QJsonValue::Array:
+				childNode = new JsonTreeModelNode(child.toArray(), this, QString::number(i));
 				break;
+
+			case QJsonValue::Object:
+				childNode = new JsonTreeModelNode(child.toObject(), this, QString::number(i));
+				break;
+
+			default: break;
 			}
-
-		case QJsonValue::Object:
-			{
-				const QJsonObject obj = value.toObject();
-				for (const QString& key : obj.keys())
-				{
-					const auto& child = obj[key];
-					auto childNode = new JsonTreeModelNode(child, this, key);
-					switch (child.type())
-					{
-					case QJsonValue::Null:
-					case QJsonValue::Bool:
-					case QJsonValue::Double:
-					case QJsonValue::String:
-						m_namedScalarMap[key] = childNode;
-						break;
-
-					case QJsonValue::Array:
-					case QJsonValue::Object:
-						m_childList << childNode;
-						break;
-
-					default: break;
-					}
-				}
-
-				m_undefinedChild = new JsonTreeModelNode(QJsonValue(), this);
-				break;
-			}
-		default: break;
+			m_childList << childNode;
 		}
+	}
 
-		qDebug() << "Node created for" << m_value;
-		qDebug() << "\tNode's named scalars:" << m_namedScalarMap;
-		qDebug() << "\tNode's children:     " << m_childList << '\n';
+	JsonTreeModelNode(const QJsonObject& obj, JsonTreeModelNode* parent, const QString& name = QString()) :
+		m_parent(parent),
+		m_name(name),
+		m_type(Structure)
+	{
+		qDebug() << "Creating Object row for" << obj;
+
+		for (const QString& key : obj.keys())
+		{
+			const auto& child = obj[key];
+//			auto childNode = new JsonTreeModelNode(child, this, key);
+
+			switch (child.type())
+			{
+			case QJsonValue::Null:
+			case QJsonValue::Bool:
+			case QJsonValue::Double:
+			case QJsonValue::String:
+				m_namedScalarMap[key] = child;
+				break;
+
+			case QJsonValue::Array:
+				m_childList << new JsonTreeModelNode(child.toArray(), this, key);
+				break;
+
+			case QJsonValue::Object:
+				m_childList << new JsonTreeModelNode(child.toObject(), this, key);
+				break;
+
+			default: break;
+			}
+		}
 	}
 
 	~JsonTreeModelNode()
 	{
 		// TODO: Tell parent to remove this child from its list? Only if we do partial deletions
 
-		qDeleteAll(m_namedScalarMap);
 		qDeleteAll(m_childList);
 	}
 
-	inline bool hasNamedScalars() const { return !m_namedScalarMap.isEmpty(); }
-	// TODO: Provide options for recursive searching and order-preservation
-	QStringList namedScalars(int /*recursionDepth*/) const { return m_namedScalarMap.keys(); } // TODO: Rename (to "scalarNames"?
 
-	JsonTreeModelNode* namedScalarNode(const QString& name) const
-	{
-		// TODO: Check if default value == nullptr
-		return m_namedScalarMap.value(name);
-	}
+	inline JsonTreeModelNode* childAt(int i) const
+	{ return m_childList[i]; }
 
-	JsonTreeModelNode* parentNode() const { return m_parent; }
+	inline int childCount() const
+	{ return m_childList.count(); }
 
-	inline bool isObject() const { return m_value.isObject(); }
-	inline bool isArray() const { return m_value.isArray(); }
-	inline bool isScalar() const { return !(isObject() || isArray()); }
+	inline QJsonValue scalarValue() const
+	{ return m_scalarValue; }
 
-	int childCount() const { return m_childList.count(); } // Excludes named scalars
+	inline QJsonValue namedScalarValue(const QString& name) const
+	{ return m_namedScalarMap[name]; }
 
-	JsonTreeModelNode* childAt(int index) const
-	{
-		if (index >= m_childList.count())
-			return nullptr;
-		return m_childList[index];
-	}
+	inline QString label() const
+	{ return m_name; }
 
-	JsonTreeModelNode* blank() const { return m_undefinedChild; } // TODO: Rename
-
-	QVariant displayData() const
-	{
-//		qDebug() << "\tDisplaying!" << m_value;
-
-		if (isScalar())
-			return m_value.toVariant();
-
-		// NOTE: Name will only be displayed in the <Structure> column
-		if (isObject() || isArray())
-			return m_name; // TODO: Do this differently?
-
-		// TODO: Check if the node can even be anything other than Object, Array, or Scalar
-		return QVariant();
-	}
-
-	QJsonValue jsonValue() const
-	{
-		return m_value;
-	}
+	inline JsonTreeModelNode* parent() const
+	{ return m_parent; }
 
 private:
-	QJsonValue m_value;
 	JsonTreeModelNode* m_parent;
-	JsonTreeModelNode* m_undefinedChild;
-	QString m_name;
-
-	QMap<QString, JsonTreeModelNode*> m_namedScalarMap;
+	QJsonValue m_scalarValue;
 	QVector<JsonTreeModelNode*> m_childList;
+	QMap<QString, QJsonValue> m_namedScalarMap;
+	QString m_name;
+	Type m_type;
 };
 
 class JsonTreeModel : public QAbstractItemModel
@@ -176,8 +163,17 @@ public:
 		// TODO: Discard old data
 
 		qDebug() << "Setting JSON:" << value;
+		switch (value.type())
+		{
+		case QJsonValue::Array:
+			m_rootNode = new JsonTreeModelNode(value.toArray(), nullptr);
+			break;
 
-		m_rootNode = new JsonTreeModelNode(value, nullptr);
+		default:
+			// Objects, scalars, null, or undefined
+			m_rootNode = new JsonTreeModelNode(QJsonArray{value}, nullptr);
+			break;
+		}
 
 		// TODO: Handle cases where there's not Struct/Scalar column
 		// TODO: Handle recursive header scans
@@ -186,18 +182,14 @@ public:
 		// TODO: Emit the relevant signals
 	}
 
-	QModelIndex blankIndex(int row, int column, const JsonTreeModelNode* parentNode, const QString& reason = QString()) const;
-
 private:
 	JsonTreeModelNode* m_rootNode;
-	JsonTreeModelNode* m_tmpUndefinedNode;
 
 	QStringList m_headers;
 
 	// TODO: Replace with QFlags
 	bool m_structColumnVisible;
 	bool m_scalarColumnVisible;
-	bool m_compactMode;
 };
 
 #endif // JSONTREEMODEL_H
