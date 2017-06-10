@@ -143,8 +143,6 @@ private:
 	QVector<JsonTreeModelNode*> m_childList;
 };
 
-
-
 class JsonTreeModel : public QAbstractItemModel
 {
 	Q_OBJECT

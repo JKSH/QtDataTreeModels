@@ -11,6 +11,7 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 	m_scalarColumnVisible = true;
 	m_compactMode = false;
 
+	// TODO: Adapt headers to the model
 	m_headers = QStringList{"<Structure>", "<Scalar>", "str1", "str2"};
 }
 
@@ -44,11 +45,11 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 {
 	qDebug() << "JsonTreeModel::index()" << row << column << parent;
 
-	if (column >= m_headers.count() || column < 0) // NOTE: m_headers also takes the struct column and scalar column into account
+	// NOTE: m_headers also takes the struct column and scalar column into account
+	if (column >= m_headers.count() || column < 0)
 		return nullIndex("Invalid header count");
 
-	// TODO: Replace with "auto"
-	JsonTreeModelNode* parentNode = parent.isValid() ?
+	auto parentNode = parent.isValid() ?
 			static_cast<JsonTreeModelNode*>(parent.internalPointer()) :
 			m_rootNode;
 
