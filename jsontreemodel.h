@@ -163,17 +163,12 @@ public:
 		// TODO: Discard old data
 
 		qDebug() << "Setting JSON:" << value;
-		switch (value.type())
-		{
-		case QJsonValue::Array:
+		if (value.type() == QJsonValue::Array)
 			m_rootNode = new JsonTreeModelNode(value.toArray(), nullptr);
-			break;
-
-		default:
-			// Objects, scalars, null, or undefined
+		else
 			m_rootNode = new JsonTreeModelNode(QJsonArray{value}, nullptr);
-			break;
-		}
+
+		// TODO: Hide the '0' label in the wrapper array
 
 		// TODO: Handle cases where there's not Struct/Scalar column
 		// TODO: Handle recursive header scans
