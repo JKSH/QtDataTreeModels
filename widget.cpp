@@ -12,7 +12,7 @@ Widget::Widget(QWidget *parent) :
 	ui->setupUi(this);
 
 ///*
-	QJsonArray array{
+	QJsonArray modelData{
 		QJsonObject{
 			{"str1", "Hello"},
 			{"str2", "World"}
@@ -43,17 +43,17 @@ Widget::Widget(QWidget *parent) :
 //*/
 
 /*
-	QJsonArray array{
+	QJsonArray modelData{
 		QJsonObject{
 			{"str1", "Hello"}
 		}
 	};
 */
 
-	qDebug() << array;
+	qDebug() << modelData;
 
 	auto model = new JsonTreeModel(this);
-	model->setJson(array);
+	model->setJson(modelData);
 
 	qDebug() << "rowCount:" << model->rowCount();
 	qDebug() << "columnCount:" << model->columnCount();
