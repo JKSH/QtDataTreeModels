@@ -13,7 +13,8 @@ class JsonTreeModelNode
 public:
 	enum Type {
 		Scalar,
-		Structure
+		Object,
+		Array
 	};
 
 	JsonTreeModelNode(const QJsonValue& value, JsonTreeModelNode* parent, const QString& name = QString()) :
@@ -28,7 +29,7 @@ public:
 	JsonTreeModelNode(const QJsonArray& arr, JsonTreeModelNode* parent, const QString& name = QString()) :
 		m_parent(parent),
 		m_name(name),
-		m_type(Structure)
+		m_type(Array)
 	{
 		qDebug() << "Creating Array row for" << arr;
 
@@ -44,15 +45,15 @@ public:
 			case QJsonValue::Bool:
 			case QJsonValue::Double:
 			case QJsonValue::String:
-				childNode = new JsonTreeModelNode(child, this, QString::number(i));
+				childNode = new JsonTreeModelNode(child, this);
 				break;
 
 			case QJsonValue::Array:
-				childNode = new JsonTreeModelNode(child.toArray(), this, QString::number(i));
+				childNode = new JsonTreeModelNode(child.toArray(), this);
 				break;
 
 			case QJsonValue::Object:
-				childNode = new JsonTreeModelNode(child.toObject(), this, QString::number(i));
+				childNode = new JsonTreeModelNode(child.toObject(), this);
 				break;
 
 			default: break;
@@ -64,7 +65,7 @@ public:
 	JsonTreeModelNode(const QJsonObject& obj, JsonTreeModelNode* parent, const QString& name = QString()) :
 		m_parent(parent),
 		m_name(name),
-		m_type(Structure)
+		m_type(Object)
 	{
 		qDebug() << "Creating Object row for" << obj;
 
@@ -120,6 +121,9 @@ public:
 
 	inline JsonTreeModelNode* parent() const
 	{ return m_parent; }
+
+	inline Type type() const
+	{ return m_type; }
 
 private:
 	JsonTreeModelNode* m_parent;

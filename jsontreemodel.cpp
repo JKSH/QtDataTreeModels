@@ -115,7 +115,12 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 		switch (col)
 		{
 		case 0: // Struct column
-			return node->label();
+			{
+				if (node->parent()->type() == JsonTreeModelNode::Array)
+					return index.row();
+				else
+					return node->label();
+			}
 
 		case 1: // Scalar column
 			return node->scalarValue();
