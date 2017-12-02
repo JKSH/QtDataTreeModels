@@ -122,12 +122,18 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 					return node->label();
 			}
 
+		/*
+			Qt Bug? (As of Qt 5.9.3)
+			- If the data value is a QJsonValue that holds a string, it shows up fine in the View.
+			- If the data value is a QJsonValue that holds a double, it doesn't show up fine in the View.
+			- If the data value is a QVariant that holds a double, it shows up fine in the View.
+		*/
 		case 1: // Scalar column
-			return node->scalarValue();
+			return node->scalarValue().toVariant();
 
 		default: // Named scalars
 			if (col < m_headers.count())
-				return node->namedScalarValue( m_headers[col] );
+				return node->namedScalarValue( m_headers[col] ).toVariant();
 		}
 	}
 	return QVariant();
