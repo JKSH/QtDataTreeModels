@@ -17,18 +17,16 @@ public:
 		Array
 	};
 
-	JsonTreeModelNode(const QJsonValue& value, JsonTreeModelNode* parent, const QString& name = QString()) :
+	JsonTreeModelNode(const QJsonValue& value, JsonTreeModelNode* parent) :
 		m_parent(parent),
 		m_scalarValue(value),
-		m_name(name), // TODO: Remove this? Perhaps the parent should keep track of the names, since it already keeps a map
 		m_type(Scalar) // TODO: Use subclassing and overridden function to report type
 	{
 		qDebug() << "Creating Scalar row for" << value;
 	}
 
-	JsonTreeModelNode(const QJsonArray& arr, JsonTreeModelNode* parent, const QString& name = QString()) :
+	JsonTreeModelNode(const QJsonArray& arr, JsonTreeModelNode* parent) :
 		m_parent(parent),
-		m_name(name),
 		m_type(Array)
 	{
 		qDebug() << "Creating Array row for" << arr;
@@ -37,7 +35,6 @@ public:
 		for (int i = 0; i < arr.count(); ++i)
 		{
 			const auto& child = arr[i];
-//			m_childList << new JsonTreeModelNode(arr[i], this, QString::number(i)); // TODO: Let the model manage the number, not the node itself
 
 			switch (child.type())
 			{
@@ -62,18 +59,16 @@ public:
 		}
 	}
 
-	JsonTreeModelNode(const QJsonObject& obj, JsonTreeModelNode* parent, const QString& name = QString()) :
+	JsonTreeModelNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
 		m_parent(parent),
-		m_name(name),
 		m_type(Object)
 	{
 		qDebug() << "Creating Object row for" << obj;
 
+		JsonTreeModelNode* childNode;
 		for (const QString& key : obj.keys())
 		{
 			const auto& child = obj[key];
-//			auto childNode = new JsonTreeModelNode(child, this, key);
-
 			switch (child.type())
 			{
 			case QJsonValue::Null:
@@ -84,15 +79,18 @@ public:
 				break;
 
 			case QJsonValue::Array:
-				m_childList << new JsonTreeModelNode(child.toArray(), this, key);
+				childNode = new JsonTreeModelNode(child.toArray(), this);
+				m_childList << childNode;
 				break;
 
 			case QJsonValue::Object:
-				m_childList << new JsonTreeModelNode(child.toObject(), this, key);
+				childNode = new JsonTreeModelNode(child.toObject(), this);
+				m_childList << childNode;
 				break;
 
 			default: break;
 			}
+			m_childNames[childNode] = key;
 		}
 	}
 
@@ -110,14 +108,14 @@ public:
 	inline int childCount() const
 	{ return m_childList.count(); }
 
+	inline QString childName(JsonTreeModelNode* child) const
+	{ return m_childNames[child]; }
+
 	inline QJsonValue scalarValue() const
 	{ return m_scalarValue; }
 
 	inline QJsonValue namedScalarValue(const QString& name) const
 	{ return m_namedScalarMap[name]; }
-
-	inline QString label() const
-	{ return m_name; }
 
 	inline JsonTreeModelNode* parent() const
 	{ return m_parent; }
@@ -129,8 +127,8 @@ private:
 	JsonTreeModelNode* m_parent;
 	QJsonValue m_scalarValue;
 	QVector<JsonTreeModelNode*> m_childList;
+	QMap<JsonTreeModelNode*, QString> m_childNames;
 	QMap<QString, QJsonValue> m_namedScalarMap;
-	QString m_name;
 	Type m_type;
 };
 

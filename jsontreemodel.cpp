@@ -119,7 +119,7 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 				if (node->parent()->type() == JsonTreeModelNode::Array)
 					return index.row();
 				else
-					return node->label();
+					return node->parent()->childName(node);
 			}
 
 		/*
