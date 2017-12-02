@@ -2,6 +2,80 @@
 #include <QJsonArray>
 
 #include <QDebug>
+JsonTreeModelScalarNode::JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent) :
+	JsonTreeModelNode(parent),
+	m_value(value)
+{
+	qDebug() << "Creating Scalar row for" << value;
+}
+
+JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeModelNode* parent) :
+	JsonTreeModelNode(parent)
+{
+	qDebug() << "Creating Array row for" << arr;
+
+	JsonTreeModelNode* childNode;
+	for (int i = 0; i < arr.count(); ++i)
+	{
+		const auto& child = arr[i];
+
+		switch (child.type())
+		{
+		case QJsonValue::Null:
+		case QJsonValue::Bool:
+		case QJsonValue::Double:
+		case QJsonValue::String:
+			childNode = new JsonTreeModelScalarNode(child, this);
+			break;
+
+		case QJsonValue::Array:
+			childNode = new JsonTreeModelListNode(child.toArray(), this);
+			break;
+
+		case QJsonValue::Object:
+			childNode = new JsonTreeModelNamedListNode(child.toObject(), this);
+			break;
+
+		default: break;
+		}
+		addChild(childNode);
+	}
+}
+
+JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
+	JsonTreeModelListNode(parent)
+{
+	qDebug() << "Creating Object row for" << obj;
+
+	JsonTreeModelNode* childNode;
+	for (const QString& key : obj.keys())
+	{
+		const auto& child = obj[key];
+		switch (child.type())
+		{
+		case QJsonValue::Null:
+		case QJsonValue::Bool:
+		case QJsonValue::Double:
+		case QJsonValue::String:
+			m_namedScalarMap[key] = child;
+			break;
+
+		case QJsonValue::Array:
+			childNode = new JsonTreeModelListNode(child.toArray(), this);
+			addChild(childNode);
+			break;
+
+		case QJsonValue::Object:
+			childNode = new JsonTreeModelNamedListNode(child.toObject(), this);
+			addChild(childNode);
+			break;
+
+		default: break;
+		}
+		m_childNames[childNode] = key;
+	}
+}
+
 
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent)
@@ -44,14 +118,17 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 			static_cast<JsonTreeModelNode*>(parent.internalPointer()) :
 			m_rootNode;
 
-	if (row >= parentNode->childCount() || row < 0)
-		return nullIndex("Invalid row number");
+	if (parentNode->type() == JsonTreeModelNode::Scalar)
+		return nullIndex("Scalar parent (Bad index!)");
 
 	// ASSUMPTION: For sub-items, parent's column always == 0 and the parent is an array/object
 	// TODO: Check assumption
+	auto specificParentNode = static_cast<JsonTreeModelListNode*>(parentNode);
+	if (row >= specificParentNode->childCount() || row < 0)
+		return nullIndex("Invalid row number");
 
-	auto childRow = parentNode->childAt(row);
 	qDebug() << "\tCreating valid index for" << row << column << childRow;
+	auto childRow = specificParentNode->childAt(row);
 	return createIndex(row, column, childRow);
 }
 
@@ -66,6 +143,7 @@ QModelIndex JsonTreeModel::parent(const QModelIndex& index) const
 		if (parentNode != nullptr && parentNode != m_rootNode)
 		{
 			// TODO: Calculate row!!!
+			Q_ASSERT(parentNode->type() != JsonTreeModelNode::Scalar);
 			qDebug() << "\tCreating NON-ROOT index, pointing to" << parentNode;
 			return createIndex(0, 0 , parentNode);
 		}
@@ -78,8 +156,12 @@ int JsonTreeModel::rowCount(const QModelIndex& parent) const
 {
 //	qDebug() << "JsonTreeModel::rowCount()" << parent;
 
+	// NOTE: A QTreeView will try to probe the child count of all nodes, so we must check the node type.
 	auto node = parent.isValid() ? static_cast<JsonTreeModelNode*>(parent.internalPointer()) : m_rootNode;
-	return node->childCount();
+	if (node->type() == JsonTreeModelNode::Scalar)
+		return 0;
+
+	return static_cast<JsonTreeModelListNode*>(node)->childCount();
 }
 
 int JsonTreeModel::columnCount(const QModelIndex& parent) const
@@ -118,8 +200,10 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 			{
 				if (node->parent()->type() == JsonTreeModelNode::Array)
 					return index.row();
-				else
-					return node->parent()->childName(node);
+
+				// A node's parent cannot be a Scalar node
+				Q_ASSERT(node->parent()->type() == JsonTreeModelNode::Object);
+				return static_cast<JsonTreeModelNamedListNode*>( node->parent() )->childName(node);
 			}
 
 		/*
@@ -129,11 +213,13 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 			- If the data value is a QVariant that holds a double, it shows up fine in the View.
 		*/
 		case 1: // Scalar column
-			return node->scalarValue().toVariant();
+			if (node->type() == JsonTreeModelNode::Scalar)
+				return static_cast<JsonTreeModelScalarNode*>(node)->value().toVariant();
+			break;
 
 		default: // Named scalars
-			if (col < m_headers.count())
-				return node->namedScalarValue( m_headers[col] ).toVariant();
+			if (col < m_headers.count() && node->type() == JsonTreeModelNode::Object)
+				return static_cast<JsonTreeModelNamedListNode*>(node)->namedScalarValue( m_headers[col] ).toVariant();
 		}
 	}
 	return QVariant();

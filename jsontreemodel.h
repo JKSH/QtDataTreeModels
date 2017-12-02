@@ -17,84 +17,40 @@ public:
 		Array
 	};
 
-	JsonTreeModelNode(const QJsonValue& value, JsonTreeModelNode* parent) :
-		m_parent(parent),
-		m_scalarValue(value),
-		m_type(Scalar) // TODO: Use subclassing and overridden function to report type
-	{
-		qDebug() << "Creating Scalar row for" << value;
-	}
+	JsonTreeModelNode(JsonTreeModelNode* parent) : m_parent(parent) {}
+	virtual ~JsonTreeModelNode() {}
 
-	JsonTreeModelNode(const QJsonArray& arr, JsonTreeModelNode* parent) :
-		m_parent(parent),
-		m_type(Array)
-	{
-		qDebug() << "Creating Array row for" << arr;
+	inline JsonTreeModelNode* parent() const
+	{ return m_parent; }
 
-		JsonTreeModelNode* childNode;
-		for (int i = 0; i < arr.count(); ++i)
-		{
-			const auto& child = arr[i];
+	virtual Type type() const = 0;
 
-			switch (child.type())
-			{
-			case QJsonValue::Null:
-			case QJsonValue::Bool:
-			case QJsonValue::Double:
-			case QJsonValue::String:
-				childNode = new JsonTreeModelNode(child, this);
-				break;
+private:
+	JsonTreeModelNode* m_parent;
+};
 
-			case QJsonValue::Array:
-				childNode = new JsonTreeModelNode(child.toArray(), this);
-				break;
+class JsonTreeModelScalarNode : public JsonTreeModelNode
+{
+public:
+	JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent);
 
-			case QJsonValue::Object:
-				childNode = new JsonTreeModelNode(child.toObject(), this);
-				break;
+	inline QJsonValue value() const
+	{ return m_value; }
 
-			default: break;
-			}
-			m_childList << childNode;
-		}
-	}
+	Type type() const override
+	{ return Scalar; }
 
-	JsonTreeModelNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
-		m_parent(parent),
-		m_type(Object)
-	{
-		qDebug() << "Creating Object row for" << obj;
+private:
+	QJsonValue m_value;
+};
 
-		JsonTreeModelNode* childNode;
-		for (const QString& key : obj.keys())
-		{
-			const auto& child = obj[key];
-			switch (child.type())
-			{
-			case QJsonValue::Null:
-			case QJsonValue::Bool:
-			case QJsonValue::Double:
-			case QJsonValue::String:
-				m_namedScalarMap[key] = child;
-				break;
+class JsonTreeModelListNode : public JsonTreeModelNode
+{
+public:
+	JsonTreeModelListNode(JsonTreeModelNode* parent) : JsonTreeModelNode(parent) {}
+	JsonTreeModelListNode(const QJsonArray& arr, JsonTreeModelNode* parent);
 
-			case QJsonValue::Array:
-				childNode = new JsonTreeModelNode(child.toArray(), this);
-				m_childList << childNode;
-				break;
-
-			case QJsonValue::Object:
-				childNode = new JsonTreeModelNode(child.toObject(), this);
-				m_childList << childNode;
-				break;
-
-			default: break;
-			}
-			m_childNames[childNode] = key;
-		}
-	}
-
-	~JsonTreeModelNode()
+	~JsonTreeModelListNode()
 	{
 		// TODO: Tell parent to remove this child from its list? Only if we do partial deletions
 
@@ -108,28 +64,34 @@ public:
 	inline int childCount() const
 	{ return m_childList.count(); }
 
+	Type type() const override
+	{ return Array; }
+
+protected:
+	void addChild(JsonTreeModelNode* child)
+	{ m_childList << child; }
+
+private:
+	QVector<JsonTreeModelNode*> m_childList;
+};
+
+class JsonTreeModelNamedListNode : public JsonTreeModelListNode
+{
+public:
+	JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent);
+
 	inline QString childName(JsonTreeModelNode* child) const
 	{ return m_childNames[child]; }
-
-	inline QJsonValue scalarValue() const
-	{ return m_scalarValue; }
 
 	inline QJsonValue namedScalarValue(const QString& name) const
 	{ return m_namedScalarMap[name]; }
 
-	inline JsonTreeModelNode* parent() const
-	{ return m_parent; }
-
-	inline Type type() const
-	{ return m_type; }
+	Type type() const override
+	{ return Object; }
 
 private:
-	JsonTreeModelNode* m_parent;
-	QJsonValue m_scalarValue;
-	QVector<JsonTreeModelNode*> m_childList;
 	QMap<JsonTreeModelNode*, QString> m_childNames;
 	QMap<QString, QJsonValue> m_namedScalarMap;
-	Type m_type;
 };
 
 class JsonTreeModel : public QAbstractItemModel
@@ -166,9 +128,9 @@ public:
 
 		qDebug() << "Setting JSON:" << value;
 		if (value.type() == QJsonValue::Array)
-			m_rootNode = new JsonTreeModelNode(value.toArray(), nullptr);
+			m_rootNode = new JsonTreeModelListNode(value.toArray(), nullptr);
 		else
-			m_rootNode = new JsonTreeModelNode(QJsonArray{value}, nullptr);
+			m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
 
 		// TODO: Hide the '0' label in the wrapper array
 
@@ -180,7 +142,7 @@ public:
 	}
 
 private:
-	JsonTreeModelNode* m_rootNode;
+	JsonTreeModelListNode* m_rootNode;
 
 	QStringList m_headers;
 
