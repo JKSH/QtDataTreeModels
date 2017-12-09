@@ -80,8 +80,8 @@ class JsonTreeModelNamedListNode : public JsonTreeModelListNode
 public:
 	JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent);
 
-	inline QString childName(JsonTreeModelNode* child) const
-	{ return m_childNames[child]; }
+	inline QString childListNodeName(JsonTreeModelNode* child) const
+	{ return m_childListNodeNames[child]; }
 
 	inline QJsonValue namedScalarValue(const QString& name) const
 	{ return m_namedScalarMap[name]; }
@@ -90,7 +90,7 @@ public:
 	{ return Object; }
 
 private:
-	QMap<JsonTreeModelNode*, QString> m_childNames;
+	QMap<JsonTreeModelNode*, QString> m_childListNodeNames;
 	QMap<QString, QJsonValue> m_namedScalarMap;
 };
 

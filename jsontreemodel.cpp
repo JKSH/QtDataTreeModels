@@ -58,21 +58,20 @@ JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, J
 		case QJsonValue::Double:
 		case QJsonValue::String:
 			m_namedScalarMap[key] = child;
-			break;
+			continue;
 
 		case QJsonValue::Array:
 			childNode = new JsonTreeModelListNode(child.toArray(), this);
-			addChild(childNode);
 			break;
 
 		case QJsonValue::Object:
 			childNode = new JsonTreeModelNamedListNode(child.toObject(), this);
-			addChild(childNode);
 			break;
 
-		default: break;
+		default: continue;
 		}
-		m_childNames[childNode] = key;
+		addChild(childNode);
+		m_childListNodeNames[childNode] = key;
 	}
 }
 
@@ -203,7 +202,7 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 
 				// A node's parent cannot be a Scalar node
 				Q_ASSERT(node->parent()->type() == JsonTreeModelNode::Object);
-				return static_cast<JsonTreeModelNamedListNode*>( node->parent() )->childName(node);
+				return static_cast<JsonTreeModelNamedListNode*>( node->parent() )->childListNodeName(node);
 			}
 
 		/*
