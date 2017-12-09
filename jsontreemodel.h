@@ -130,7 +130,8 @@ public:
 		// TODO: Discard old data
 
 		qDebug() << "Setting JSON:" << value;
-		if (value.type() == QJsonValue::Array)
+		m_hasWrapper = (value.type() != QJsonValue::Array);
+		if (!m_hasWrapper)
 			m_rootNode = new JsonTreeModelListNode(value.toArray(), nullptr);
 		else
 			m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
@@ -144,9 +145,12 @@ public:
 		// TODO: Emit the relevant signals
 	}
 
+	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
+
 private:
 	JsonTreeModelListNode* m_rootNode;
 	QStringList m_headers;
+	bool m_hasWrapper;
 };
 
 #endif // JSONTREEMODEL_H

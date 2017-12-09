@@ -96,7 +96,8 @@ JsonTreeModelNamedListNode::value() const
 }
 
 JsonTreeModel::JsonTreeModel(QObject* parent) :
-	QAbstractItemModel(parent)
+	QAbstractItemModel(parent),
+	m_hasWrapper(false)
 {
 	// TODO: Adapt headers to the model
 	m_headers = QStringList{"<Structure>", "<Scalar>", "str1", "str2"};
@@ -237,4 +238,40 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 		}
 	}
 	return QVariant();
+}
+
+QJsonValue JsonTreeModel::json(const QModelIndex& index) const
+{
+	// Not top-level
+	if (index.isValid())
+	{
+		auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
+
+		switch (index.column())
+		{
+		case 0: // "Structure" column
+			if (node->type() != JsonTreeModelNode::Scalar)
+				return node->value();
+			break;
+
+		case 1: // "Scalar" column
+			if (node->type() == JsonTreeModelNode::Scalar)
+				return node->value();
+			break;
+
+		default: // Named scalar columns
+			if (node->type() == JsonTreeModelNode::Object)
+				return static_cast<JsonTreeModelNamedListNode*>(node)->namedScalarValue(m_headers[index.column()]);
+		}
+		return QJsonValue();
+	}
+
+	// Top-level
+	if (m_hasWrapper)
+	{
+		if (m_rootNode->childCount() == 0)
+			return QJsonValue();
+		return m_rootNode->childAt(0)->value();
+	}
+	return m_rootNode->value();
 }
