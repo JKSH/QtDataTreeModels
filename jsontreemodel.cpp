@@ -98,10 +98,6 @@ JsonTreeModelNamedListNode::value() const
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent)
 {
-	// TODO: Make use of the following flags
-	m_structColumnVisible = true;
-	m_scalarColumnVisible = true;
-
 	// TODO: Adapt headers to the model
 	m_headers = QStringList{"<Structure>", "<Scalar>", "str1", "str2"};
 }

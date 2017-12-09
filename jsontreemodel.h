@@ -54,10 +54,8 @@ public:
 	~JsonTreeModelListNode()
 	{
 		// TODO: Tell parent to remove this child from its list? Only if we do partial deletions
-
 		qDeleteAll(m_childList);
 	}
-
 
 	inline JsonTreeModelNode* childAt(int i) const
 	{ return m_childList[i]; }
@@ -139,7 +137,7 @@ public:
 
 		// TODO: Hide the '0' label in the wrapper array
 
-		// TODO: Handle cases where there's not Struct/Scalar column
+		// TODO: Handle cases where there's no Struct/Scalar column
 		// TODO: Handle recursive header scans
 //		m_headers = QStringList{"<structure>", "<scalar>"} << m_rootNode->namedScalars(0);
 
@@ -148,12 +146,7 @@ public:
 
 private:
 	JsonTreeModelListNode* m_rootNode;
-
 	QStringList m_headers;
-
-	// TODO: Replace with QFlags
-	bool m_structColumnVisible;
-	bool m_scalarColumnVisible;
 };
 
 #endif // JSONTREEMODEL_H
