@@ -42,6 +42,15 @@ JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeMode
 	}
 }
 
+QJsonValue
+JsonTreeModelListNode::value() const
+{
+	QJsonArray fullArray;
+	for (const auto childNode : qAsConst(m_childList))
+		fullArray << childNode->value();
+	return fullArray;
+}
+
 JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
 	JsonTreeModelListNode(parent)
 {
@@ -75,6 +84,16 @@ JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, J
 	}
 }
 
+QJsonValue
+JsonTreeModelNamedListNode::value() const
+{
+	QJsonObject fullObject;
+	for (auto i = m_namedScalarMap.constBegin(); i != m_namedScalarMap.constEnd(); ++i)
+		fullObject.insert(i.key(), i.value());
+	for (auto i = m_childListNodeNames.constBegin(); i != m_childListNodeNames.constEnd(); ++i)
+		fullObject.insert(i.value(), i.key()->value()); // i's value is the element name, while i's key is the node
+	return fullObject;
+}
 
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent)

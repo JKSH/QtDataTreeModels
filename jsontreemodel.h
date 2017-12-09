@@ -24,6 +24,7 @@ public:
 	{ return m_parent; }
 
 	virtual Type type() const = 0;
+	virtual QJsonValue value() const = 0;
 
 private:
 	JsonTreeModelNode* m_parent;
@@ -34,7 +35,7 @@ class JsonTreeModelScalarNode : public JsonTreeModelNode
 public:
 	JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent);
 
-	inline QJsonValue value() const
+	QJsonValue value() const override
 	{ return m_value; }
 
 	Type type() const override
@@ -67,6 +68,8 @@ public:
 	Type type() const override
 	{ return Array; }
 
+	QJsonValue value() const override;
+
 protected:
 	void addChild(JsonTreeModelNode* child)
 	{ m_childList << child; }
@@ -88,6 +91,8 @@ public:
 
 	Type type() const override
 	{ return Object; }
+
+	QJsonValue value() const override;
 
 private:
 	QMap<JsonTreeModelNode*, QString> m_childListNodeNames;
