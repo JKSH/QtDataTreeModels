@@ -97,6 +97,7 @@ JsonTreeModelNamedListNode::value() const
 
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent),
+	m_rootNode(nullptr),
 	m_hasWrapper(false)
 {
 	// TODO: Adapt headers to the model
