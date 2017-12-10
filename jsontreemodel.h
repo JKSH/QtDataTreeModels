@@ -128,6 +128,7 @@ public:
 	void setJson(const QJsonValue& value)
 	{
 		qDebug() << "Setting JSON:" << value;
+		beginResetModel();
 		if (m_rootNode != nullptr)
 			delete m_rootNode;
 
@@ -137,13 +138,13 @@ public:
 		else
 			m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
 
+		endResetModel();
+
 		// TODO: Hide the '0' label in the wrapper array
 
 		// TODO: Handle cases where there's no Struct/Scalar column
 		// TODO: Handle recursive header scans
 //		m_headers = QStringList{"<structure>", "<scalar>"} << m_rootNode->namedScalars(0);
-
-		// TODO: Emit the relevant signals
 	}
 
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
