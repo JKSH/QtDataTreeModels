@@ -129,8 +129,10 @@ public:
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
 private:
+	static QSet<QString> findScalarNames(const QJsonValue& data, bool comprehensive);
+
 	JsonTreeModelListNode* m_rootNode;
-	QStringList m_headers;
+	QVector<QString> m_headers;
 	bool m_hasWrapper;
 };
 

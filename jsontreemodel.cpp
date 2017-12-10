@@ -98,11 +98,9 @@ JsonTreeModelNamedListNode::value() const
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent),
 	m_rootNode(nullptr),
+	m_headers({"<Structure>", "<Scalar>"}),
 	m_hasWrapper(false)
-{
-	// TODO: Adapt headers to the model
-	m_headers = QStringList{"<Structure>", "<Scalar>", "str1", "str2"};
-}
+{}
 
 QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -291,11 +289,48 @@ JsonTreeModel::setJson(const QJsonValue& value)
 	else
 		m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
 
+	m_headers.resize(2); // Remove all columns except Structure and Scalar
+	m_headers << findScalarNames(value, false).toList().toVector(); // TODO: Give QList and QVector API parity to avoid this double-conversion?
+
 	endResetModel();
 
 	// TODO: Hide the '0' label in the wrapper array
-
 	// TODO: Handle cases where there's no Struct/Scalar column
-	// TODO: Handle recursive header scans
-//		m_headers = QStringList{"<structure>", "<scalar>"} << m_rootNode->namedScalars(0);
+}
+
+QSet<QString>
+JsonTreeModel::findScalarNames(const QJsonValue &data, bool comprehensive)
+{
+	auto processArray = [](const QJsonArray& array, bool comprehensive) -> QSet<QString>
+	{
+		QSet<QString> names;
+		for (const auto element : array)
+		{
+			names += findScalarNames(element, comprehensive);
+			if (!comprehensive)
+				break; // Non-comprehensive searches only look at the first array element
+		}
+		return names;
+	};
+
+	QSet<QString> names;
+	if (data.type() == QJsonValue::Array)
+		names += processArray(data.toArray(), comprehensive);
+
+	else if (data.type() == QJsonValue::Object)
+	{
+		auto dataObj = data.toObject();
+		for (auto i = dataObj.constBegin(); i != dataObj.constEnd(); ++i)
+		{
+			const auto value = i.value();
+			if (value.type() == QJsonValue::Array)
+				names += processArray(value.toArray(), comprehensive);
+			else if (value.type() == QJsonValue::Object)
+				names += findScalarNames(value, comprehensive);
+			else
+				names += i.key(); // This is a scalar
+		}
+	}
+
+	return names;
 }
