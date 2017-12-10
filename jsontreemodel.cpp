@@ -275,3 +275,26 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 	}
 	return m_rootNode->value();
 }
+
+void
+JsonTreeModel::setJson(const QJsonValue& value)
+{
+	qDebug() << "Setting JSON:" << value;
+	beginResetModel();
+	if (m_rootNode != nullptr)
+		delete m_rootNode;
+
+	m_hasWrapper = (value.type() != QJsonValue::Array);
+	if (!m_hasWrapper)
+		m_rootNode = new JsonTreeModelListNode(value.toArray(), nullptr);
+	else
+		m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
+
+	endResetModel();
+
+	// TODO: Hide the '0' label in the wrapper array
+
+	// TODO: Handle cases where there's no Struct/Scalar column
+	// TODO: Handle recursive header scans
+//		m_headers = QStringList{"<structure>", "<scalar>"} << m_rootNode->namedScalars(0);
+}
