@@ -111,7 +111,7 @@ public:
 	};
 
 	explicit JsonTreeModel(QObject* parent = nullptr);
-	~JsonTreeModel(){}
+	~JsonTreeModel() { delete m_rootNode; }
 
 	// Header:
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -127,9 +127,10 @@ public:
 
 	void setJson(const QJsonValue& value)
 	{
-		// TODO: Discard old data
-
 		qDebug() << "Setting JSON:" << value;
+		if (m_rootNode != nullptr)
+			delete m_rootNode;
+
 		m_hasWrapper = (value.type() != QJsonValue::Array);
 		if (!m_hasWrapper)
 			m_rootNode = new JsonTreeModelListNode(value.toArray(), nullptr);
