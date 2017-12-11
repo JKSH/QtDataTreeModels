@@ -129,13 +129,13 @@ public:
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
 	void setScalarColumns(const QStringList& columns);
-	QStringList scalarColumns() const { return m_headers.mid(2).toList(); }
+	QStringList scalarColumns() const { return m_headers.mid(2); }
 
 private:
 	static QSet<QString> findScalarNames(const QJsonValue& data, bool comprehensive);
 
 	JsonTreeModelListNode* m_rootNode;
-	QVector<QString> m_headers;
+	QStringList m_headers;
 	bool m_hasWrapper;
 };
 

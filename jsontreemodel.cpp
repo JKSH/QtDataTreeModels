@@ -289,8 +289,11 @@ JsonTreeModel::setJson(const QJsonValue& value)
 	else
 		m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
 
-	m_headers.resize(2); // Remove all columns except Structure and Scalar
-	m_headers << findScalarNames(value, false).toList().toVector(); // TODO: Give QList and QVector API parity to avoid this double-conversion?
+	auto scalarCols = findScalarNames(value, false).toList();
+	std::sort(scalarCols.begin(), scalarCols.end());
+
+	// TODO: Implement QList::resize() upstream to discard all columns except the first two? See QTBUG-42732
+	m_headers = QStringList{m_headers[0], m_headers[1]} << scalarCols;
 
 	endResetModel();
 
@@ -301,12 +304,10 @@ JsonTreeModel::setJson(const QJsonValue& value)
 void
 JsonTreeModel::setScalarColumns(const QStringList& columns)
 {
+	// TODO: Check if it's safe to call this function straight from setJson(), which causes nested beginResetModel() calls
 	// TODO: Check if there's anything in common first, before nuking the whole model?
 	beginResetModel();
-
-	m_headers.resize(2); // Remove all columns except Structure and Scalar
-	m_headers << columns.toVector(); // TODO: Check if it's safe to call this function straight from setJson(), which causes nested beginResetModel() calls
-
+	m_headers = QStringList{m_headers[0], m_headers[1]} << columns;
 	endResetModel();
 }
 
