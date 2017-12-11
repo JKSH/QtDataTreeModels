@@ -298,6 +298,18 @@ JsonTreeModel::setJson(const QJsonValue& value)
 	// TODO: Handle cases where there's no Struct/Scalar column
 }
 
+void
+JsonTreeModel::setScalarColumns(const QStringList& columns)
+{
+	// TODO: Check if there's anything in common first, before nuking the whole model?
+	beginResetModel();
+
+	m_headers.resize(2); // Remove all columns except Structure and Scalar
+	m_headers << columns.toVector(); // TODO: Check if it's safe to call this function straight from setJson(), which causes nested beginResetModel() calls
+
+	endResetModel();
+}
+
 QSet<QString>
 JsonTreeModel::findScalarNames(const QJsonValue &data, bool comprehensive)
 {

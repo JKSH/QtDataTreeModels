@@ -128,6 +128,9 @@ public:
 	void setJson(const QJsonValue& value);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
+	void setScalarColumns(const QStringList& columns);
+	QStringList scalarColumns() const { return m_headers.mid(2).toList(); }
+
 private:
 	static QSet<QString> findScalarNames(const QJsonValue& data, bool comprehensive);
 
