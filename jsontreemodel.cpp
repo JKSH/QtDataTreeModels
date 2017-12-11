@@ -99,6 +99,7 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent),
 	m_rootNode(nullptr),
 	m_headers({"<Structure>", "<Scalar>"}),
+	m_scalarColumnDiscoveryMode(QuickSearch),
 	m_hasWrapper(false)
 {}
 
@@ -289,11 +290,15 @@ JsonTreeModel::setJson(const QJsonValue& value)
 	else
 		m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
 
-	auto scalarCols = findScalarNames(value, false).toList();
-	std::sort(scalarCols.begin(), scalarCols.end());
-
-	// TODO: Implement QList::resize() upstream to discard all columns except the first two? See QTBUG-42732
-	m_headers = QStringList{m_headers[0], m_headers[1]} << scalarCols;
+	auto headerMode = scalarColumnDiscoveryMode();
+	if (headerMode != Manual)
+	{
+		auto scalarCols = findScalarNames( value, (headerMode == ComprehensiveSearch) ).toList();
+		std::sort(scalarCols.begin(), scalarCols.end());
+		m_headers = QStringList{m_headers[0], m_headers[1]} << scalarCols;
+		// TODO: Implement QList::resize() upstream to discard all columns except the first two? See QTBUG-42732
+		// TODO: Check if it's safe to call setScalarColumns() here, which causes nested beginResetModel() calls
+	}
 
 	endResetModel();
 
@@ -304,7 +309,6 @@ JsonTreeModel::setJson(const QJsonValue& value)
 void
 JsonTreeModel::setScalarColumns(const QStringList& columns)
 {
-	// TODO: Check if it's safe to call this function straight from setJson(), which causes nested beginResetModel() calls
 	// TODO: Check if there's anything in common first, before nuking the whole model?
 	beginResetModel();
 	m_headers = QStringList{m_headers[0], m_headers[1]} << columns;

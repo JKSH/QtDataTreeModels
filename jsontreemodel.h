@@ -102,12 +102,11 @@ class JsonTreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
-	// TODO: Make these flags; add "PreserveOrder" flag for Comprehensive mode
-	enum HeaderDiscoveryMode
+	enum ScalarColumnDiscoveryMode
 	{
 		Manual,
-		FirstObjectOnly,
-		Comprehensive
+		QuickSearch,
+		ComprehensiveSearch
 	};
 
 	explicit JsonTreeModel(QObject* parent = nullptr);
@@ -125,6 +124,9 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+	ScalarColumnDiscoveryMode scalarColumnDiscoveryMode() const { return m_scalarColumnDiscoveryMode; }
+	void setScalarColumnDiscoveryMode(ScalarColumnDiscoveryMode mode) { m_scalarColumnDiscoveryMode = mode; }
+
 	void setJson(const QJsonValue& value);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
@@ -136,6 +138,7 @@ private:
 
 	JsonTreeModelListNode* m_rootNode;
 	QStringList m_headers;
+	ScalarColumnDiscoveryMode m_scalarColumnDiscoveryMode;
 	bool m_hasWrapper;
 };
 
