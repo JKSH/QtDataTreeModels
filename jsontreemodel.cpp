@@ -2,6 +2,10 @@
 #include <QJsonArray>
 
 #include <QDebug>
+
+//=================================
+// JsonTreeModelNode and subclasses
+//=================================
 JsonTreeModelScalarNode::JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent),
 	m_value(value)
@@ -95,6 +99,10 @@ JsonTreeModelNamedListNode::value() const
 	return fullObject;
 }
 
+
+//=================================
+// JsonTreeModel itself
+//=================================
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent),
 	m_rootNode(nullptr),
@@ -222,10 +230,17 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 			}
 
 		/*
-			Qt Bug? (As of Qt 5.9.3)
+			Qt Bug? (As of Qt 5.10.0)
 			- If the data value is a QJsonValue that holds a string, it shows up fine in the View.
 			- If the data value is a QJsonValue that holds a double, it doesn't show up fine in the View.
 			- If the data value is a QVariant that holds a double, it shows up fine in the View.
+
+			Possibly related to the fact that QVariant::toString() works if the data is QJsonValue::String, but not QJsonValue::Number
+
+			See also
+			- QTBUG-52097
+			- QTBUG-53579
+			- QTBUG-60999
 		*/
 		case 1: // Scalar column
 			if (node->type() == JsonTreeModelNode::Scalar)
@@ -246,7 +261,6 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 	if (index.isValid())
 	{
 		auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
-
 		switch (index.column())
 		{
 		case 0: // "Structure" column

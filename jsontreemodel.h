@@ -8,6 +8,18 @@
 
 #include <QDebug>
 
+//=================================
+// JsonTreeModelNode and subclasses
+//=================================
+/*
+	If only we could get a QJsonValueRef to a nested item,
+	we wouldn't need such "heavy" node classes...
+*/
+/*
+	TODO: Support user-defined Structure and Scalar column names
+	TODO: Support user-defined icons for different datatypes in Structure column???
+	TODO: Support user-defined font for Array indices in Structure column???
+*/
 class JsonTreeModelNode
 {
 public:
@@ -27,6 +39,7 @@ public:
 	virtual QJsonValue value() const = 0;
 
 private:
+	// NOTE: Only JsonTreeModelListNode can be a parent, but I don't want to introduce a dependency to a subclass
 	JsonTreeModelNode* m_parent;
 };
 
@@ -97,6 +110,10 @@ private:
 	QMap<QString, QJsonValue> m_namedScalarMap;
 };
 
+
+//=================================
+// JsonTreeModel itself
+//=================================
 class JsonTreeModel : public QAbstractItemModel
 {
 	Q_OBJECT
