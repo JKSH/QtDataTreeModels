@@ -321,6 +321,24 @@ JsonTreeModel::setJson(const QJsonValue& value)
 }
 
 void
+JsonTreeModel::setJson(const QJsonObject& object, ScalarColumnDiscoveryMode searchMode)
+{
+	// TODO: (See todo list of other overload)
+	beginResetModel();
+	if (m_rootNode != nullptr)
+		delete m_rootNode;
+	m_rootNode = new JsonTreeModelNamedListNode(object, nullptr);
+
+	if (searchMode != Manual)
+	{
+		auto scalarCols = findScalarNames( object, (searchMode == ComprehensiveSearch) ).toList();
+		std::sort(scalarCols.begin(), scalarCols.end());
+		m_headers = QStringList{m_headers[0], m_headers[1]} << scalarCols;
+	}
+	endResetModel();
+}
+
+void
 JsonTreeModel::setScalarColumns(const QStringList& columns)
 {
 	// TODO: Check if there's anything in common first, before nuking the whole model?

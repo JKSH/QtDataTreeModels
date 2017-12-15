@@ -145,6 +145,7 @@ public:
 	void setScalarColumnDiscoveryMode(ScalarColumnDiscoveryMode mode) { m_scalarColumnDiscoveryMode = mode; }
 
 	void setJson(const QJsonValue& value);
+	void setJson(const QJsonObject& object, ScalarColumnDiscoveryMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
 	void setScalarColumns(const QStringList& columns);

@@ -93,10 +93,16 @@ Widget::Widget(QWidget *parent) :
 
 		if (err.error == QJsonParseError::NoError)
 		{
+			auto headerSearchMode = JsonTreeModel::Manual;
+			if (ui->comboBox->currentIndex() == 1)
+				headerSearchMode = JsonTreeModel::QuickSearch;
+			else if (ui->comboBox->currentIndex() == 2)
+				headerSearchMode = JsonTreeModel::ComprehensiveSearch;
+
 			if (doc.isArray())
 				model->setJson(doc.array());
 			else if (doc.isObject())
-				model->setJson(doc.object());
+				model->setJson(doc.object(), headerSearchMode);
 		}
 		else if (err.error == QJsonParseError::IllegalValue)
 		{
