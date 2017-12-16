@@ -104,8 +104,14 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 
 QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-	if (role == Qt::DisplayRole && orientation == Qt::Horizontal && section < m_headers.count())
-		return m_headers[section];
+	if (role == Qt::DisplayRole)
+	{
+		if (orientation == Qt::Horizontal && section < m_headers.count())
+			return m_headers[section];
+
+		// ASSUMPTION: Vertical headers are only requested by Table Views
+		return data(index(section, 0));
+	}
 	return QAbstractItemModel::headerData(section, orientation, role);
 }
 
