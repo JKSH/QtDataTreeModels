@@ -291,23 +291,16 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 }
 
 void
-JsonTreeModel::setJson(const QJsonValue& value)
+JsonTreeModel::setJson(const QJsonArray& array, ScalarColumnDiscoveryMode searchMode)
 {
-	qDebug() << "Setting JSON:" << value;
 	beginResetModel();
 	if (m_rootNode != nullptr)
 		delete m_rootNode;
+	m_rootNode = new JsonTreeModelListNode(array, nullptr);
 
-	m_hasWrapper = (value.type() != QJsonValue::Array);
-	if (!m_hasWrapper)
-		m_rootNode = new JsonTreeModelListNode(value.toArray(), nullptr);
-	else
-		m_rootNode = new JsonTreeModelListNode(QJsonArray{value}, nullptr);
-
-	auto headerMode = scalarColumnDiscoveryMode();
-	if (headerMode != Manual)
+	if (searchMode != Manual)
 	{
-		auto scalarCols = findScalarNames( value, (headerMode == ComprehensiveSearch) ).toList();
+		auto scalarCols = findScalarNames( array, (searchMode == ComprehensiveSearch) ).toList();
 		std::sort(scalarCols.begin(), scalarCols.end());
 		m_headers = QStringList{m_headers[0], m_headers[1]} << scalarCols;
 		// TODO: Implement QList::resize() upstream to discard all columns except the first two? See QTBUG-42732

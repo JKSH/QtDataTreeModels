@@ -100,7 +100,7 @@ Widget::Widget(QWidget *parent) :
 				headerSearchMode = JsonTreeModel::ComprehensiveSearch;
 
 			if (doc.isArray())
-				model->setJson(doc.array());
+				model->setJson(doc.array(), headerSearchMode);
 			else if (doc.isObject())
 				model->setJson(doc.object(), headerSearchMode);
 		}

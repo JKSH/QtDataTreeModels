@@ -144,7 +144,7 @@ public:
 	ScalarColumnDiscoveryMode scalarColumnDiscoveryMode() const { return m_scalarColumnDiscoveryMode; }
 	void setScalarColumnDiscoveryMode(ScalarColumnDiscoveryMode mode) { m_scalarColumnDiscoveryMode = mode; }
 
-	void setJson(const QJsonValue& value);
+	void setJson(const QJsonArray& array, ScalarColumnDiscoveryMode searchMode = QuickSearch);
 	void setJson(const QJsonObject& object, ScalarColumnDiscoveryMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
