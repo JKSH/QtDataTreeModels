@@ -106,9 +106,7 @@ JsonTreeModelNamedListNode::value() const
 JsonTreeModel::JsonTreeModel(QObject* parent) :
 	QAbstractItemModel(parent),
 	m_rootNode(nullptr),
-	m_headers({"<Structure>", "<Scalar>"}),
-	m_scalarColumnDiscoveryMode(QuickSearch),
-	m_hasWrapper(false)
+	m_headers({"<Structure>", "<Scalar>"})
 {}
 
 QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -281,12 +279,6 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 	}
 
 	// Top-level
-	if (m_hasWrapper)
-	{
-		if (m_rootNode->childCount() == 0)
-			return QJsonValue();
-		return m_rootNode->childAt(0)->value();
-	}
 	return m_rootNode->value();
 }
 
@@ -309,7 +301,6 @@ JsonTreeModel::setJson(const QJsonArray& array, ScalarColumnDiscoveryMode search
 
 	endResetModel();
 
-	// TODO: Hide the '0' label in the wrapper array
 	// TODO: Handle cases where there's no Struct/Scalar column
 }
 

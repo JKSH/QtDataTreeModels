@@ -141,9 +141,6 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-	ScalarColumnDiscoveryMode scalarColumnDiscoveryMode() const { return m_scalarColumnDiscoveryMode; }
-	void setScalarColumnDiscoveryMode(ScalarColumnDiscoveryMode mode) { m_scalarColumnDiscoveryMode = mode; }
-
 	void setJson(const QJsonArray& array, ScalarColumnDiscoveryMode searchMode = QuickSearch);
 	void setJson(const QJsonObject& object, ScalarColumnDiscoveryMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
@@ -156,8 +153,6 @@ private:
 
 	JsonTreeModelListNode* m_rootNode;
 	QStringList m_headers;
-	ScalarColumnDiscoveryMode m_scalarColumnDiscoveryMode;
-	bool m_hasWrapper;
 };
 
 #endif // JSONTREEMODEL_H

@@ -63,16 +63,6 @@ Widget::Widget(QWidget *parent) :
 
 
 	// Connect inputs
-	connect(ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index)
-	{
-		if (index == 2)
-			model->setScalarColumnDiscoveryMode(JsonTreeModel::ComprehensiveSearch);
-		else if (index == 1)
-			model->setScalarColumnDiscoveryMode(JsonTreeModel::QuickSearch);
-		else
-			model->setScalarColumnDiscoveryMode(JsonTreeModel::Manual);
-	});
-
 	connect(ui->pb_setScalarColumns, &QPushButton::clicked, [=]
 	{
 		auto columns = ui->te_scalarColumns->toPlainText().split('\n', QString::SkipEmptyParts);
@@ -103,29 +93,6 @@ Widget::Widget(QWidget *parent) :
 				model->setJson(doc.array(), headerSearchMode);
 			else if (doc.isObject())
 				model->setJson(doc.object(), headerSearchMode);
-		}
-		else if (err.error == QJsonParseError::IllegalValue)
-		{
-			/*
-				Qt bug? (as of Qt 5.10.0)
-				- QJsonDocument::fromJson() fails with QJsonParseError::IllegalValue if the document is a single scalar value
-
-				We do manual parsing here
-			*/
-			if (rawString.startsWith('\"') && rawString.endsWith('\"'))
-				model->setJson(   QJsonValue(  rawString.mid( 1, rawString.length()-2 )  )   );
-			else if (  isdigit( rawString[0].toLatin1() )  ) // ASSUMPTION: QJsonParseError::IllegalValue means the string is not empty
-				model->setJson(  QJsonValue( rawString.toDouble() ) );
-			else
-			{
-				auto moddedString = rawString.toLower();
-				if (moddedString == "true" || moddedString == "false")
-					model->setJson( QJsonValue(moddedString == "true") );
-				else if (moddedString == "null")
-					model->setJson( QJsonValue() );
-				else
-					qDebug() << "NOOOO!!!";
-			}
 
 			qDebug() << "LETS SEE";
 			qDebug() << model->json();
