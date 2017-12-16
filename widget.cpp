@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include <QMessageBox>
 
 #include "jsontreemodel.h"
 #include <QJsonDocument>
@@ -97,6 +98,8 @@ Widget::Widget(QWidget *parent) :
 			qDebug() << "LETS SEE";
 			qDebug() << model->json();
 		}
+		else
+			QMessageBox::warning(this, "Error", "Invalid JSON array/object");
 	});
 
 
