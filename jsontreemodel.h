@@ -6,8 +6,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include <QDebug>
-
 //=================================
 // JsonTreeModelNode and subclasses
 //=================================

@@ -1,7 +1,6 @@
 #include "jsontreemodel.h"
 #include <QJsonArray>
-
-#include <QDebug>
+#include <QSet>
 
 //=================================
 // JsonTreeModelNode and subclasses
@@ -9,15 +8,11 @@
 JsonTreeModelScalarNode::JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent),
 	m_value(value)
-{
-	qDebug() << "Creating Scalar row for" << value;
-}
+{}
 
 JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent)
 {
-	qDebug() << "Creating Array row for" << arr;
-
 	JsonTreeModelNode* childNode;
 	for (int i = 0; i < arr.count(); ++i)
 	{
@@ -58,8 +53,6 @@ JsonTreeModelListNode::value() const
 JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
 	JsonTreeModelListNode(parent)
 {
-	qDebug() << "Creating Object row for" << obj;
-
 	JsonTreeModelNode* childNode;
 	for (const QString& key : obj.keys())
 	{
@@ -111,52 +104,36 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 
 QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-//	qDebug() << "JsonTreeModel::headerData()" << section << orientation << role;
-
 	if (role == Qt::DisplayRole && orientation == Qt::Horizontal && section < m_headers.count())
 		return m_headers[section];
-
 	return QAbstractItemModel::headerData(section, orientation, role);
-}
-
-QModelIndex nullIndex(const QString& reason)
-{
-	if (!reason.isEmpty())
-		qDebug() << "\tCreating NULL index:" << reason;
-
-	return QModelIndex();
 }
 
 QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent) const
 {
-	qDebug() << "JsonTreeModel::index()" << row << column << parent;
-
 	// NOTE: m_headers also takes the struct column and scalar column into account
 	if (column >= m_headers.count() || column < 0)
-		return nullIndex("Invalid header count");
+		return QModelIndex();
 
 	auto parentNode = parent.isValid() ?
 			static_cast<JsonTreeModelNode*>(parent.internalPointer()) :
 			m_rootNode;
 
 	if (parentNode->type() == JsonTreeModelNode::Scalar)
-		return nullIndex("Scalar parent (Bad index!)");
+		return QModelIndex();
 
 	// ASSUMPTION: For sub-items, parent's column always == 0 and the parent is an array/object
 	// TODO: Check assumption
 	auto specificParentNode = static_cast<JsonTreeModelListNode*>(parentNode);
 	if (row >= specificParentNode->childCount() || row < 0)
-		return nullIndex("Invalid row number");
+		return QModelIndex();
 
-	qDebug() << "\tCreating valid index for" << row << column << childRow;
 	auto childRow = specificParentNode->childAt(row);
 	return createIndex(row, column, childRow);
 }
 
 QModelIndex JsonTreeModel::parent(const QModelIndex& index) const
 {
-	qDebug() << "JsonTreeModel::parent()" << index;
-
 	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
 	if (node)
 	{
@@ -165,18 +142,14 @@ QModelIndex JsonTreeModel::parent(const QModelIndex& index) const
 		{
 			// TODO: Calculate row!!!
 			Q_ASSERT(parentNode->type() != JsonTreeModelNode::Scalar);
-			qDebug() << "\tCreating NON-ROOT index, pointing to" << parentNode;
 			return createIndex(0, 0 , parentNode);
 		}
-		return nullIndex("Parent is root or doesn't exist");
 	}
-	return nullIndex("Node not specified");
+	return QModelIndex();
 }
 
 int JsonTreeModel::rowCount(const QModelIndex& parent) const
 {
-//	qDebug() << "JsonTreeModel::rowCount()" << parent;
-
 	// NOTE: A QTreeView will try to probe the child count of all nodes, so we must check the node type.
 	auto node = parent.isValid() ? static_cast<JsonTreeModelNode*>(parent.internalPointer()) : m_rootNode;
 	if (node->type() == JsonTreeModelNode::Scalar)
@@ -189,30 +162,21 @@ int JsonTreeModel::columnCount(const QModelIndex& parent) const
 {
 	Q_UNUSED(parent);
 
-//	qDebug() << "JsonTreeModel::columnCount()" << parent;
-
 	// ASSUMPTION: The headers list includes Struct and Scalar columns
 	return m_headers.count();
 }
 
 QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 {
-//	qDebug() << "JsonTreeModel::data()" << index << role;
-	qDebug() << '.';
-
 	// ASSUMPTION: The process of generating this index has already validated the data
 	if (!index.isValid())
 		return QVariant();
 
 	if (role == Qt::DisplayRole)
 	{
-//		qDebug() << "JsonTreeModel::data()" << index << (DISPLAYROLE);
 		auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
 		if (!node)
-		{
-			qDebug() << "\tNull node!";
 			return QVariant();
-		}
 
 		auto col = index.column();
 		switch (col)
@@ -298,7 +262,6 @@ JsonTreeModel::setJson(const QJsonArray& array, ScalarColumnSearchMode searchMod
 		// TODO: Implement QList::resize() upstream to discard all columns except the first two? See QTBUG-42732
 		// TODO: Check if it's safe to call setScalarColumns() here, which causes nested beginResetModel() calls
 	}
-
 	endResetModel();
 
 	// TODO: Handle cases where there's no Struct/Scalar column

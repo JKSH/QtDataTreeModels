@@ -4,7 +4,6 @@
 
 #include "jsontreemodel.h"
 #include <QJsonDocument>
-#include <QDebug>
 
 Widget::Widget(QWidget *parent) :
 	QWidget(parent),
@@ -51,13 +50,9 @@ Widget::Widget(QWidget *parent) :
 	};
 */
 
-	qDebug() << modelData;
 
 	auto model = new JsonTreeModel(this);
 	model->setJson(modelData);
-
-	qDebug() << "rowCount:" << model->rowCount();
-	qDebug() << "columnCount:" << model->columnCount();
 
 	ui->treeView->setModel(model);
 	ui->tableView->setModel(model);
@@ -94,9 +89,6 @@ Widget::Widget(QWidget *parent) :
 				model->setJson(doc.array(), headerSearchMode);
 			else if (doc.isObject())
 				model->setJson(doc.object(), headerSearchMode);
-
-			qDebug() << "LETS SEE";
-			qDebug() << model->json();
 		}
 		else
 			QMessageBox::warning(this, "Error", "Invalid JSON array/object");
@@ -107,7 +99,6 @@ Widget::Widget(QWidget *parent) :
 	auto getModelJson = [=](const QModelIndex& index) -> QByteArray
 	{
 		auto json = model->json(index);
-
 		switch (json.type())
 		{
 		case QJsonValue::Bool: return json.toBool() ? "true" : "false";
