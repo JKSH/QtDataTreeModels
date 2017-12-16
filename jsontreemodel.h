@@ -119,9 +119,9 @@ class JsonTreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
-	enum ScalarColumnDiscoveryMode
+	enum ScalarColumnSearchMode
 	{
-		Manual,
+		NoSearch,
 		QuickSearch,
 		ComprehensiveSearch
 	};
@@ -141,8 +141,8 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-	void setJson(const QJsonArray& array, ScalarColumnDiscoveryMode searchMode = QuickSearch);
-	void setJson(const QJsonObject& object, ScalarColumnDiscoveryMode searchMode = QuickSearch);
+	void setJson(const QJsonArray& array, ScalarColumnSearchMode searchMode = QuickSearch);
+	void setJson(const QJsonObject& object, ScalarColumnSearchMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
 	void setScalarColumns(const QStringList& columns);

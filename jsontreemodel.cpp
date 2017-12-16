@@ -283,14 +283,14 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 }
 
 void
-JsonTreeModel::setJson(const QJsonArray& array, ScalarColumnDiscoveryMode searchMode)
+JsonTreeModel::setJson(const QJsonArray& array, ScalarColumnSearchMode searchMode)
 {
 	beginResetModel();
 	if (m_rootNode != nullptr)
 		delete m_rootNode;
 	m_rootNode = new JsonTreeModelListNode(array, nullptr);
 
-	if (searchMode != Manual)
+	if (searchMode != NoSearch)
 	{
 		auto scalarCols = findScalarNames( array, (searchMode == ComprehensiveSearch) ).toList();
 		std::sort(scalarCols.begin(), scalarCols.end());
@@ -305,7 +305,7 @@ JsonTreeModel::setJson(const QJsonArray& array, ScalarColumnDiscoveryMode search
 }
 
 void
-JsonTreeModel::setJson(const QJsonObject& object, ScalarColumnDiscoveryMode searchMode)
+JsonTreeModel::setJson(const QJsonObject& object, ScalarColumnSearchMode searchMode)
 {
 	// TODO: (See todo list of other overload)
 	beginResetModel();
@@ -313,7 +313,7 @@ JsonTreeModel::setJson(const QJsonObject& object, ScalarColumnDiscoveryMode sear
 		delete m_rootNode;
 	m_rootNode = new JsonTreeModelNamedListNode(object, nullptr);
 
-	if (searchMode != Manual)
+	if (searchMode != NoSearch)
 	{
 		auto scalarCols = findScalarNames( object, (searchMode == ComprehensiveSearch) ).toList();
 		std::sort(scalarCols.begin(), scalarCols.end());

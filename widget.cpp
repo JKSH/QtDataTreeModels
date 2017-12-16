@@ -84,7 +84,7 @@ Widget::Widget(QWidget *parent) :
 
 		if (err.error == QJsonParseError::NoError)
 		{
-			auto headerSearchMode = JsonTreeModel::Manual;
+			auto headerSearchMode = JsonTreeModel::NoSearch;
 			if (ui->comboBox->currentIndex() == 1)
 				headerSearchMode = JsonTreeModel::QuickSearch;
 			else if (ui->comboBox->currentIndex() == 2)
