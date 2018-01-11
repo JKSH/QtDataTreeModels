@@ -49,6 +49,9 @@ public:
 	QJsonValue value() const override
 	{ return m_value; }
 
+	void setValue(const QJsonValue& value)
+	{ m_value = value; }
+
 	Type type() const override
 	{ return Scalar; }
 
@@ -98,6 +101,12 @@ public:
 	inline QJsonValue namedScalarValue(const QString& name) const
 	{ return m_namedScalarMap[name]; }
 
+	inline void setNamedScalarValue(const QString& name, const QJsonValue& value)
+	{
+		Q_ASSERT(value.type() != QJsonValue::Undefined && value.type() != QJsonValue::Array && value.type() != QJsonValue::Object);
+		m_namedScalarMap[name] = value;
+	}
+
 	Type type() const override
 	{ return Object; }
 
@@ -139,6 +148,11 @@ public:
 
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+	// Editable:
+	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+	Qt::ItemFlags flags(const QModelIndex& index) const override;
+
+	// API specific to JsonTreeModel:
 	void setJson(const QJsonArray& array, ScalarColumnSearchMode searchMode = QuickSearch);
 	void setJson(const QJsonObject& object, ScalarColumnSearchMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
@@ -148,6 +162,7 @@ public:
 
 private:
 	static QSet<QString> findScalarNames(const QJsonValue& data, bool comprehensive);
+	bool isEditable(const QModelIndex& index) const;
 
 	JsonTreeModelListNode* m_rootNode;
 	QStringList m_headers;

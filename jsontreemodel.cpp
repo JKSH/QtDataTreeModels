@@ -178,7 +178,7 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 	if (!index.isValid())
 		return QVariant();
 
-	if (role == Qt::DisplayRole)
+	if (role == Qt::DisplayRole || role == Qt::EditRole)
 	{
 		auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
 		if (!node)
@@ -221,6 +221,79 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 		}
 	}
 	return QVariant();
+}
+
+bool JsonTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+	if ( role != Qt::EditRole
+			|| !isEditable(index) // NOTE: isEditable() checks for index validity
+			|| data(index, role) == value )
+	{
+		return false;
+	}
+
+	QJsonValue newData;
+	switch (value.type())
+	{
+	case QMetaType::Void:
+		// newData remains null
+		break;
+
+	case QMetaType::Bool:
+		newData = value.toBool();
+		break;
+
+	case QMetaType::Short:
+	case QMetaType::UShort:
+	case QMetaType::Int:
+	case QMetaType::UInt:
+	case QMetaType::Long:
+	case QMetaType::ULong:
+	case QMetaType::LongLong:
+	case QMetaType::ULongLong:
+	case QMetaType::Float:
+	case QMetaType::Double:
+		newData = value.toDouble(); // TODO: Preserve numeric representation?
+		break;
+
+	// TODO: Convert char/QChar?
+
+	case QMetaType::QString:
+		newData = value.toString();
+		break;
+
+	default:
+		return false;
+	}
+
+	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
+	Q_ASSERT(node != nullptr);
+	switch (index.column())
+	{
+	case 0: // "Structure" column
+		return false; // TODO: Allow changing an Object's member names
+
+	case 1: // "Scalar" column
+		Q_ASSERT(node->type() == JsonTreeModelNode::Scalar);
+		static_cast<JsonTreeModelScalarNode*>(node)->setValue(newData);
+		break;
+
+	default: // Named scalar columns
+		if (node->type() == JsonTreeModelNode::Object)
+			static_cast<JsonTreeModelNamedListNode*>(node)->setNamedScalarValue(m_headers[index.column()], newData);
+		else
+			return false;
+	}
+
+	emit dataChanged(index, index, QVector<int>{role});
+	return true;
+}
+
+Qt::ItemFlags JsonTreeModel::flags(const QModelIndex& index) const
+{
+	if (isEditable(index))
+		return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+	return QAbstractItemModel::flags(index);
 }
 
 QJsonValue JsonTreeModel::json(const QModelIndex& index) const
@@ -335,4 +408,18 @@ JsonTreeModel::findScalarNames(const QJsonValue &data, bool comprehensive)
 	}
 
 	return names;
+}
+
+bool
+JsonTreeModel::isEditable(const QModelIndex& index) const
+{
+	if (!index.isValid())
+		return false;
+
+	// TODO: Allow changing an Object's member names
+	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
+	return !(  node->type() == JsonTreeModelNode::Array
+			|| ( node->type() == JsonTreeModelNode::Scalar && index.column() != 1 )
+			|| ( node->type() == JsonTreeModelNode::Object && index.column() <= 1 )  );
+
 }
