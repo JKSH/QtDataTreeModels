@@ -318,29 +318,27 @@ Qt::ItemFlags JsonTreeModel::flags(const QModelIndex& index) const
 */
 QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 {
-	// Not top-level
-	if (index.isValid())
-	{
-		auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
-		switch (index.column())
-		{
-		case 0: // "Structure" column
-			return node->value();
-
-		case 1: // "Scalar" column
-			if (node->type() == JsonTreeModelNode::Scalar)
-				return node->value();
-			break;
-
-		default: // Named scalar columns
-			if (node->type() == JsonTreeModelNode::Object)
-				return static_cast<JsonTreeModelNamedListNode*>(node)->namedScalarValue(m_headers[index.column()]);
-		}
-		return QJsonValue();
-	}
-
 	// Top-level
-	return m_rootNode->value();
+	if (!index.isValid())
+		return m_rootNode->value();
+
+	// Not top-level
+	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
+	switch (index.column())
+	{
+	case 0: // "Structure" column
+		return node->value();
+
+	case 1: // "Scalar" column
+		if (node->type() == JsonTreeModelNode::Scalar)
+			return node->value();
+		break;
+
+	default: // Named scalar columns
+		if (node->type() == JsonTreeModelNode::Object)
+			return static_cast<JsonTreeModelNamedListNode*>(node)->namedScalarValue(m_headers[index.column()]);
+	}
+	return QJsonValue();
 }
 
 void
