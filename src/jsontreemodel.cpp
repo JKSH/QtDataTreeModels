@@ -304,6 +304,18 @@ Qt::ItemFlags JsonTreeModel::flags(const QModelIndex& index) const
 	return QAbstractItemModel::flags(index);
 }
 
+
+/*!
+	\brief Returns the JSON value associated with the \a index.
+
+	If the \a index is invalid, then this function returns the entire JSON data structure stored in
+	the	model.
+
+	If \e index.column() is zero, then this function returns the full JSON value associated with the
+	entire indexed row (which might be a JSON object or array). Otherwise, this function returns a
+	single scalar value associated with the indexed item (or an undefined QJsonValue if the \a index
+	doesn't point to a valid value).
+*/
 QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 {
 	// Not top-level
@@ -313,9 +325,7 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 		switch (index.column())
 		{
 		case 0: // "Structure" column
-			if (node->type() != JsonTreeModelNode::Scalar)
-				return node->value();
-			break;
+			return node->value();
 
 		case 1: // "Scalar" column
 			if (node->type() == JsonTreeModelNode::Scalar)
