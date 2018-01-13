@@ -58,6 +58,13 @@ JsonTreeModelListNode::value() const
 	return fullArray;
 }
 
+void
+JsonTreeModelListNode::addChild(JsonTreeModelNode* child)
+{
+	m_childPositions[child] = m_childList.count();
+	m_childList << child;
+}
+
 JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
 	JsonTreeModelListNode(parent)
 {
@@ -154,9 +161,12 @@ QModelIndex JsonTreeModel::parent(const QModelIndex& index) const
 		auto parentNode = node->parent();
 		if (parentNode != nullptr && parentNode != m_rootNode)
 		{
-			// TODO: Calculate row!!!
 			Q_ASSERT(parentNode->type() != JsonTreeModelNode::Scalar);
-			return createIndex(0, 0 , parentNode);
+			auto grandparentNode = static_cast<JsonTreeModelListNode*>(parentNode->parent());
+			Q_ASSERT(grandparentNode != nullptr);
+			int parentRow = grandparentNode->childPosition(parentNode);
+
+			return createIndex(parentRow, 0 , parentNode);
 		}
 	}
 	return QModelIndex();

@@ -85,17 +85,20 @@ public:
 	inline int childCount() const
 	{ return m_childList.count(); }
 
+	inline int childPosition(JsonTreeModelNode* child) const
+	{ return m_childPositions.value(child, -1); }
+
 	Type type() const override
 	{ return Array; }
 
 	QJsonValue value() const override;
 
 protected:
-	void addChild(JsonTreeModelNode* child)
-	{ m_childList << child; }
+	void addChild(JsonTreeModelNode* child);
 
 private:
 	QVector<JsonTreeModelNode*> m_childList;
+	QMap<JsonTreeModelNode*, int> m_childPositions;
 };
 
 class JsonTreeModelNamedListNode : public JsonTreeModelListNode
@@ -121,6 +124,7 @@ public:
 	QJsonValue value() const override;
 
 private:
+	// TODO: Use JsonTreeModelListNode::childPosition() for indexing; not need for map with m_childListNodeNames
 	QMap<JsonTreeModelNode*, QString> m_childListNodeNames;
 	QMap<QString, QJsonValue> m_namedScalarMap;
 };
