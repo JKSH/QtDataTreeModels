@@ -107,6 +107,19 @@ JsonTreeModelNamedListNode::value() const
 	return fullObject;
 }
 
+/*!
+	\brief Constructs a wrapper for \a realNode and takes ownership of it.
+
+	Unlike the constructors for other classes derived from JsonTreeModelNode, this one does not take a parent
+	because JsonTreeModelWrapperNode is only meant to be used as the JsonTreeModel's root node.
+*/
+JsonTreeModelWrapperNode::JsonTreeModelWrapperNode(JsonTreeModelNamedListNode* realNode) :
+	JsonTreeModelListNode(nullptr)
+{
+	addChild(realNode);
+	realNode->setParent(this);
+}
+
 
 //=================================
 // JsonTreeModel itself
@@ -379,7 +392,15 @@ JsonTreeModel::setJson(const QJsonObject& object, ScalarColumnSearchMode searchM
 	beginResetModel();
 	if (m_rootNode != nullptr)
 		delete m_rootNode;
-	m_rootNode = new JsonTreeModelNamedListNode(object, nullptr);
+
+	auto namedListNode = new JsonTreeModelNamedListNode(object, nullptr);
+	if (namedListNode->namedScalarCount() > 0)
+	{
+		auto wrapper = new JsonTreeModelWrapperNode(namedListNode);
+		m_rootNode = wrapper;
+	}
+	else
+		m_rootNode = namedListNode;
 
 	if (searchMode != NoSearch)
 	{

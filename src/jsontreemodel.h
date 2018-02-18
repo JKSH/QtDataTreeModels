@@ -135,6 +135,15 @@ private:
 	QMap<QString, QJsonValue> m_namedScalarMap;
 };
 
+class JsonTreeModelWrapperNode : public JsonTreeModelListNode
+{
+public:
+	JsonTreeModelWrapperNode(JsonTreeModelNamedListNode* realNode);
+
+	QJsonValue value() const override
+	{ return childAt(0)->value(); } // ASSUMPTION: A wrapper node will always have exactly 1 child JsonTreeModelNamedListNode
+};
+
 
 //=================================
 // JsonTreeModel itself
