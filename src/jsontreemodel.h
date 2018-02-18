@@ -41,6 +41,9 @@ public:
 	inline JsonTreeModelNode* parent() const
 	{ return m_parent; }
 
+	inline void setParent(JsonTreeModelNode* parent)
+	{ Q_ASSERT(parent->type() != Scalar); m_parent = parent; } // FIXME: This currently creates an inconsistent state if the node is a child of JsonTreeModelListNode
+
 	virtual Type type() const = 0;
 	virtual QJsonValue value() const = 0;
 
@@ -108,6 +111,9 @@ public:
 
 	inline QString childListNodeName(JsonTreeModelNode* child) const
 	{ return m_childListNodeNames[child]; }
+
+	inline int namedScalarCount() const
+	{ return m_namedScalarMap.size(); }
 
 	inline QJsonValue namedScalarValue(const QString& name) const
 	{ return m_namedScalarMap[name]; }
