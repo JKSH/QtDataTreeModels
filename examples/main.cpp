@@ -6,13 +6,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 \*/
 
-#include "widget.h"
+#include "jsonwidget.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	Widget w;
+	JsonWidget w;
 	w.show();
 
 	return a.exec();

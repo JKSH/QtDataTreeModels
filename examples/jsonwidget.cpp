@@ -6,16 +6,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 \*/
 
-#include "widget.h"
-#include "ui_widget.h"
+#include "jsonwidget.h"
+#include "ui_jsonwidget.h"
 #include <QMessageBox>
 
 #include "../src/jsontreemodel.h"
 #include <QJsonDocument>
 
-Widget::Widget(QWidget *parent) :
+JsonWidget::JsonWidget(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::Widget)
+	ui(new Ui::JsonWidget)
 {
 	ui->setupUi(this);
 
@@ -140,7 +140,7 @@ Widget::Widget(QWidget *parent) :
 	});
 }
 
-Widget::~Widget()
+JsonWidget::~JsonWidget()
 {
 	delete ui;
 }

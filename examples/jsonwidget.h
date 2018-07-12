@@ -6,25 +6,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 \*/
 
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef JSONWIDGET_H
+#define JSONWIDGET_H
 
 #include <QWidget>
 
 namespace Ui {
-class Widget;
+class JsonWidget;
 }
 
-class Widget : public QWidget
+class JsonWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit Widget(QWidget *parent = 0);
-	~Widget();
+	explicit JsonWidget(QWidget* parent = 0);
+	~JsonWidget();
 
 private:
-	Ui::Widget *ui;
+	Ui::JsonWidget* ui;
 };
 
-#endif // WIDGET_H
+#endif // JSONWIDGET_H
