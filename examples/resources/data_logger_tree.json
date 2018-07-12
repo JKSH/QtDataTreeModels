@@ -1,0 +1,26 @@
+{
+	"Server Properties": {
+		"Server ID": "314159",
+		"Client IP Addresses": [
+			"192.168.0.10",
+			"192.168.0.11",
+			"192.168.0.12"
+		]
+	},
+	"Analog Inputs": [
+		{
+			"Channel Name": "Transducer X",
+			"Analog Input Type": "Voltage",
+			"Scale": 1,
+			"Offset": 0,
+			"High Resolution": false
+		},
+		{
+			"Channel Name": "Sensor Y",
+			"Analog Input Type": "Current",
+			"Scale": 6.25,
+			"Offset": -25,
+			"High Resolution": true
+		}
+	]
+}

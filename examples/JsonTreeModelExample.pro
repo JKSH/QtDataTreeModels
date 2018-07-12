@@ -14,3 +14,6 @@ HEADERS += \
 
 FORMS += \
     jsonwidget.ui
+
+RESOURCES += \
+    jsonsamples.qrc

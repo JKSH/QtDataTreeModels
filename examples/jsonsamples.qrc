@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/address_book_table.json</file>
+        <file>resources/data_logger_tree.json</file>
+    </qresource>
+</RCC>
