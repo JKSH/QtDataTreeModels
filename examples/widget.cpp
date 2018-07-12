@@ -10,7 +10,7 @@
 #include "ui_widget.h"
 #include <QMessageBox>
 
-#include "jsontreemodel.h"
+#include "../src/jsontreemodel.h"
 #include <QJsonDocument>
 
 Widget::Widget(QWidget *parent) :
