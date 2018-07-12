@@ -15,7 +15,8 @@
 
 JsonWidget::JsonWidget(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::JsonWidget)
+	ui(new Ui::JsonWidget),
+	m_model(new JsonTreeModel(this))
 {
 	ui->setupUi(this);
 
@@ -59,7 +60,7 @@ JsonWidget::JsonWidget(QWidget *parent) :
 */
 
 
-	auto model = new JsonTreeModel(this);
+	auto model = m_model;
 	model->setJson(modelData);
 
 	ui->treeView->setModel(model);
@@ -73,34 +74,8 @@ JsonWidget::JsonWidget(QWidget *parent) :
 		model->setScalarColumns(columns);
 	});
 
-	connect(ui->pb_setJson, &QPushButton::clicked, [=]
-	{
-		/*
-			Qt bug? (as of Qt 5.10.0)
-			- QJsonDocument::fromJson() fails with QJsonParseError::IllegalValue if the document is a single scalar value
-			- doc.toVariant() correctly produces a QVariantList/QVariantMap if doc contains an array/object
-			- doc.toVariant().toJsonValue() always produces a null value
-		*/
-		QJsonParseError err;
-		auto rawString = ui->te_json->toPlainText();
-		auto doc = QJsonDocument::fromJson(rawString.toUtf8(), &err);
-
-		if (err.error == QJsonParseError::NoError)
-		{
-			auto headerSearchMode = JsonTreeModel::NoSearch;
-			if (ui->comboBox->currentIndex() == 1)
-				headerSearchMode = JsonTreeModel::QuickSearch;
-			else if (ui->comboBox->currentIndex() == 2)
-				headerSearchMode = JsonTreeModel::ComprehensiveSearch;
-
-			if (doc.isArray())
-				model->setJson(doc.array(), headerSearchMode);
-			else if (doc.isObject())
-				model->setJson(doc.object(), headerSearchMode);
-		}
-		else
-			QMessageBox::warning(this, "Error", "Invalid JSON array/object");
-	});
+	connect(ui->pb_setJson, &QPushButton::clicked,
+			this, &JsonWidget::applyJsonText);
 
 
 	// Connect View actions
@@ -143,4 +118,28 @@ JsonWidget::JsonWidget(QWidget *parent) :
 JsonWidget::~JsonWidget()
 {
 	delete ui;
+}
+
+void
+JsonWidget::applyJsonText()
+{
+	QJsonParseError err;
+	auto rawString = ui->te_json->toPlainText();
+	auto doc = QJsonDocument::fromJson(rawString.toUtf8(), &err);
+
+	if (err.error == QJsonParseError::NoError)
+	{
+		auto headerSearchMode = JsonTreeModel::NoSearch;
+		if (ui->comboBox->currentIndex() == 1)
+			headerSearchMode = JsonTreeModel::QuickSearch;
+		else if (ui->comboBox->currentIndex() == 2)
+			headerSearchMode = JsonTreeModel::ComprehensiveSearch;
+
+		if (doc.isArray())
+			m_model->setJson(doc.array(), headerSearchMode);
+		else if (doc.isObject())
+			m_model->setJson(doc.object(), headerSearchMode);
+	}
+	else
+		QMessageBox::warning(this, "Error", "Invalid JSON array/object");
 }

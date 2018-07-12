@@ -10,6 +10,7 @@
 #define JSONWIDGET_H
 
 #include <QWidget>
+class JsonTreeModel;
 
 namespace Ui {
 class JsonWidget;
@@ -23,8 +24,12 @@ public:
 	explicit JsonWidget(QWidget* parent = 0);
 	~JsonWidget();
 
+private slots:
+	void applyJsonText();
+
 private:
 	Ui::JsonWidget* ui;
+	JsonTreeModel* m_model;
 };
 
 #endif // JSONWIDGET_H
