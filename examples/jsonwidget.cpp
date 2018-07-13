@@ -22,7 +22,6 @@ JsonWidget::JsonWidget(QWidget *parent) :
 
 	auto model = m_model;
 	ui->treeView->setModel(model);
-	ui->tableView->setModel(model);
 
 
 	// Connect inputs
@@ -74,22 +73,6 @@ JsonWidget::JsonWidget(QWidget *parent) :
 	connect(ui->treeView, &QTreeView::clicked, [=](const QModelIndex& index)
 	{
 		ui->ter_treeView->setText(getModelJson(index));
-	});
-
-	connect(ui->tableView, &QTableView::clicked, [=](const QModelIndex& index)
-	{
-		ui->ter_tableView->setText(getModelJson(index));
-	});
-
-	// Connect splitters
-	connect(ui->sp_treeView, &QSplitter::splitterMoved, [=]
-	{
-		ui->sp_tableView->setSizes(ui->sp_treeView->sizes());
-	});
-
-	connect(ui->sp_tableView, &QSplitter::splitterMoved, [=]
-	{
-		ui->sp_treeView->setSizes(ui->sp_tableView->sizes());
 	});
 }
 
