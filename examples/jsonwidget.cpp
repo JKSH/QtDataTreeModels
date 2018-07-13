@@ -20,49 +20,7 @@ JsonWidget::JsonWidget(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-///*
-	QJsonArray modelData{
-		QJsonObject{
-			{"str1", "Hello"},
-			{"str2", "World"}
-		},
-		"Yabba",
-		"Dabba",
-		QJsonObject{
-			{"str1", "Scooby"},
-			{"str2", "Doo"}
-		},
-		QJsonArray{
-			QJsonObject{
-				{"obj1", QJsonObject{
-						{"str1", "So"},
-						{"str2", "Long"}
-					}
-				},
-				{"obj2", QJsonObject{
-						{"str1", "Fare"},
-						{"str2", "Well"}
-					}
-				}
-			},
-			"Yee",
-			"Haw"
-		}
-	};
-//*/
-
-/*
-	QJsonArray modelData{
-		QJsonObject{
-			{"str1", "Hello"}
-		}
-	};
-*/
-
-
 	auto model = m_model;
-	model->setJson(modelData);
-
 	ui->treeView->setModel(model);
 	ui->tableView->setModel(model);
 
