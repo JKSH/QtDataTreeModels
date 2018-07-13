@@ -24,6 +24,8 @@ public:
 	explicit JsonWidget(QWidget* parent = 0);
 	~JsonWidget();
 
+	void addDocument(const QString& name, const QJsonDocument& doc);
+
 private slots:
 	void applyJsonText();
 

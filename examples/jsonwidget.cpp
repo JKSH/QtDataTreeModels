@@ -77,6 +77,26 @@ JsonWidget::JsonWidget(QWidget *parent) :
 	connect(ui->pb_setJson, &QPushButton::clicked,
 			this, &JsonWidget::applyJsonText);
 
+	connect(ui->cb_jsonSource, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index)
+	{
+		if (index == 0)
+		{
+			// Let the user type in the JSON text; don't update the model
+			ui->te_json->setEnabled(true);
+			ui->pb_setJson->setEnabled(true);
+		}
+		else
+		{
+			// Apply the preset, read-only JSON text; auto-update the model
+			ui->te_json->setEnabled(false);
+			ui->pb_setJson->setEnabled(false);
+
+			auto jsonText = ui->cb_jsonSource->itemData(index).toString();
+			ui->te_json->setText(jsonText);
+			applyJsonText();
+		}
+	});
+
 
 	// Connect View actions
 	auto getModelJson = [=](const QModelIndex& index) -> QByteArray
@@ -118,6 +138,14 @@ JsonWidget::JsonWidget(QWidget *parent) :
 JsonWidget::~JsonWidget()
 {
 	delete ui;
+}
+
+void
+JsonWidget::addDocument(const QString& name, const QJsonDocument& doc)
+{
+	// Stringify, store, and select the JSON document
+	ui->cb_jsonSource->addItem(name, doc.toJson());
+	ui->cb_jsonSource->setCurrentIndex( ui->cb_jsonSource->count() - 1 );
 }
 
 void

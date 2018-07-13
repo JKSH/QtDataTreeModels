@@ -92,20 +92,31 @@
          <widget class="QWidget" name="verticalLayoutWidget_2">
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>JSON</string>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>JSON Input</string>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTextEdit" name="te_json"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pb_setJson">
-             <property name="text">
-              <string>Set JSON</string>
-             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_12">
+              <item>
+               <widget class="QComboBox" name="cb_jsonSource">
+                <item>
+                 <property name="text">
+                  <string>&lt;Custom...&gt;</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTextEdit" name="te_json"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pb_setJson">
+                <property name="text">
+                 <string>Set JSON</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
