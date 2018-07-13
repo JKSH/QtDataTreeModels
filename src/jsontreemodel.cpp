@@ -292,7 +292,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 			static_cast<JsonTreeModelNode*>(parent.internalPointer()) :
 			m_rootNode;
 
-	if (parentNode->type() == JsonTreeModelNode::Scalar)
+	if (parentNode == nullptr || parentNode->type() == JsonTreeModelNode::Scalar) // Short-circuit
 		return QModelIndex();
 
 	// ASSUMPTION: For sub-items, parent's column always == 0 and the parent is an array/object
@@ -337,7 +337,7 @@ int JsonTreeModel::rowCount(const QModelIndex& parent) const
 {
 	// NOTE: A QTreeView will try to probe the child count of all nodes, so we must check the node type.
 	auto node = parent.isValid() ? static_cast<JsonTreeModelNode*>(parent.internalPointer()) : m_rootNode;
-	if (node->type() == JsonTreeModelNode::Scalar)
+	if (node == nullptr || node->type() == JsonTreeModelNode::Scalar) // Short-circuit
 		return 0;
 
 	return static_cast<JsonTreeModelListNode*>(node)->childCount();
@@ -577,7 +577,11 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 {
 	// Top-level
 	if (!index.isValid())
+	{
+		if (m_rootNode == nullptr)
+			return QJsonValue();
 		return m_rootNode->value();
+	}
 
 	// Not top-level
 	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
