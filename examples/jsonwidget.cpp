@@ -74,6 +74,12 @@ JsonWidget::JsonWidget(QWidget *parent) :
 	{
 		ui->ter_treeView->setText(getModelJson(index));
 	});
+
+
+	// Auto-expand all new data, for easier demos.
+	// NOTE: This is expensive for large models!
+	connect(m_model, &QAbstractItemModel::modelReset,
+			ui->treeView, &QTreeView::expandAll);
 }
 
 JsonWidget::~JsonWidget()
