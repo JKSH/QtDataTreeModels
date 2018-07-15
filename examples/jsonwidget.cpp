@@ -108,6 +108,8 @@ JsonWidget::applyJsonText()
 			m_model->setJson(doc.array(), headerSearchMode);
 		else if (doc.isObject())
 			m_model->setJson(doc.object(), headerSearchMode);
+
+		ui->te_scalarColumns->setText( m_model->scalarColumns().join('\n') );
 	}
 	else
 		QMessageBox::warning(this, "Error", "Invalid JSON array/object");
