@@ -34,7 +34,7 @@
         <item>
          <widget class="QLabel" name="lb_discoveryMode">
           <property name="text">
-           <string>Discovery Mode</string>
+           <string>Discovery Mode &lt;em&gt;(when setting a new JSON Input)&lt;/em&gt;</string>
           </property>
          </widget>
         </item>
@@ -63,7 +63,7 @@
         <item>
          <widget class="QLabel" name="lb_scalarColumns">
           <property name="text">
-           <string>Scalar Columns (One per Line)</string>
+           <string>Scalar Column Elements &lt;em&gt;(1 per line)&lt;/em&gt;</string>
           </property>
          </widget>
         </item>
