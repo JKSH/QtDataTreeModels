@@ -85,6 +85,29 @@ JsonTreeModelListNode::registerChild(JsonTreeModelNode* child)
 	m_childList << child;
 }
 
+/*!
+	\brief Removes the \a child node from this node's hierarchy
+
+	\note Only the \a child's parent can call this function
+
+	\internal
+*/
+void
+JsonTreeModelListNode::deregisterChild(JsonTreeModelNode* child)
+{
+	Q_ASSERT_X(child->parent() == this, "deregisterChild()", "Only a parent can deregister its own child");
+	auto i = m_childPositions.take(child);
+	m_childList.remove(i);
+
+	// ASSUMPTION: Registration/deregistration is infrequent, but lookups are very frequent. Thus, this O(n) loop is acceptable.
+	while (i < m_childList.count())
+	{
+		m_childPositions[ m_childList[i] ] = i;
+		++i;
+	}
+	// TODO: Add function to deregister multiple children simultaneously
+}
+
 JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
 	JsonTreeModelListNode(parent)
 {

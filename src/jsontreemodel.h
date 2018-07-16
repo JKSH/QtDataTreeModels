@@ -98,6 +98,7 @@ public:
 
 protected:
 	void registerChild(JsonTreeModelNode* child);
+	void deregisterChild(JsonTreeModelNode* child);
 
 private:
 	QVector<JsonTreeModelNode*> m_childList;
