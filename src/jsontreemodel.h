@@ -42,7 +42,7 @@ public:
 	{ return m_parent; }
 
 	inline void setParent(JsonTreeModelNode* parent)
-	{ Q_ASSERT(parent->type() != Scalar); m_parent = parent; } // FIXME: This currently creates an inconsistent state if the node is a child of JsonTreeModelListNode
+	{ Q_ASSERT(parent->type() != Scalar); m_parent = parent; }
 
 	virtual Type type() const = 0;
 	virtual QJsonValue value() const = 0;
@@ -97,7 +97,7 @@ public:
 	QJsonValue value() const override;
 
 protected:
-	void addChild(JsonTreeModelNode* child);
+	void registerChild(JsonTreeModelNode* child);
 
 private:
 	QVector<JsonTreeModelNode*> m_childList;

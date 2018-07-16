@@ -13,6 +13,18 @@
 //=================================
 // JsonTreeModelNode and subclasses
 //=================================
+/*!
+	\fn JsonTreeModelNode::setParent
+	\brief Makes this node a child of \a parent
+
+	\note Only a JsonTreeModelListNode can be a parent
+
+	\warning This function only updates this node's internal pointer to its parent. The caller is
+			 responsible for updating the child's registration manually.
+
+	\internal
+*/
+
 JsonTreeModelScalarNode::JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent),
 	m_value(value)
@@ -45,7 +57,7 @@ JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeMode
 
 		default: break;
 		}
-		addChild(childNode);
+		registerChild(childNode);
 	}
 }
 
@@ -58,9 +70,17 @@ JsonTreeModelListNode::value() const
 	return fullArray;
 }
 
+/*!
+	\brief Puts the \a child node under this node's hierarchy
+
+	\note Only the \a child's parent can call this function
+
+	\internal
+*/
 void
-JsonTreeModelListNode::addChild(JsonTreeModelNode* child)
+JsonTreeModelListNode::registerChild(JsonTreeModelNode* child)
 {
+	Q_ASSERT_X(child->parent() == this, "registerChild()", "Only a parent can register its own child");
 	m_childPositions[child] = m_childList.count();
 	m_childList << child;
 }
@@ -91,7 +111,7 @@ JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, J
 
 		default: continue;
 		}
-		addChild(childNode);
+		registerChild(childNode);
 		m_childListNodeNames[childNode] = key;
 	}
 }
@@ -116,8 +136,11 @@ JsonTreeModelNamedListNode::value() const
 JsonTreeModelWrapperNode::JsonTreeModelWrapperNode(JsonTreeModelNamedListNode* realNode) :
 	JsonTreeModelListNode(nullptr)
 {
-	addChild(realNode);
+	Q_ASSERT(realNode->parent() == nullptr);
+
+	// NOTE: Only a parent can register a child, so we must call setParent() before registerChild()
 	realNode->setParent(this);
+	registerChild(realNode);
 }
 
 
