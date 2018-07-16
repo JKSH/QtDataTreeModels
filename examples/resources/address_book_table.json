@@ -1,0 +1,38 @@
+[
+	{
+		"First Name": "Hua",
+		"Last Name": "Li",
+		"Phone Number": "+86 21 51748525",
+		"Country": "China"
+	}, {
+		"First Name": "Gildong",
+		"Last Name": "Hong",
+		"Phone Number": "+82 31 712 0045",
+		"Country": "South Korea"
+	}, {
+		"First Name": "Tarou",
+		"Last Name": "Yamada",
+		"Phone Number": "+81 3 6264 4500",
+		"Country": "Japan"
+	}, {
+		"First Name": "Jane",
+		"Last Name": "Doe",
+		"Phone Number": "+1 408 906 8400",
+		"Country": "USA"
+	}, {
+		"First Name": "Erika",
+		"Last Name": "Mustermann",
+		"Phone Number": "+49 30 63923257",
+		"Country": "Germany"
+	}, {
+		"First Name": "Pyotr",
+		"Last Name": "Ivanov",
+		"Phone Number": "+7 921 097 7252",
+		"Country": "Russia"
+	}, {
+		"First Name": "Kari",
+		"Last Name": "Nordmann",
+		"Phone Number": "+47 21 08 04 20",
+		"Country": "Norway"
+	}
+]

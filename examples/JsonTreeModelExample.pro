@@ -5,12 +5,15 @@ TEMPLATE = app
 
 SOURCES += \
     main.cpp \
-    widget.cpp \
+    jsonwidget.cpp \
     ../src/jsontreemodel.cpp
 
 HEADERS += \
-    widget.h \
+    jsonwidget.h \
     ../src/jsontreemodel.h
 
 FORMS += \
-    widget.ui
+    jsonwidget.ui
+
+RESOURCES += \
+    jsonsamples.qrc

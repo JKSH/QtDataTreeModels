@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>JsonWidget</class>
+ <widget class="QWidget" name="JsonWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>768</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>JsonWidget</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QSplitter" name="spl_overall">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
+     <widget class="QSplitter" name="spl_left">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QGroupBox" name="gb_instructions">
+       <property name="title">
+        <string>Instructions</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTextEdit" name="ter_instructions">
+          <property name="palette">
+           <palette>
+            <active>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>222</red>
+                <green>222</green>
+                <blue>222</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </active>
+            <inactive>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>222</red>
+                <green>222</green>
+                <blue>222</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </inactive>
+            <disabled>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </disabled>
+           </palette>
+          </property>
+          <property name="undoRedoEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;ol style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Examine the data in the &lt;span style=&quot; font-weight:600;&quot;&gt;Tree View&lt;/span&gt; (at the top-right of this widget).&lt;/li&gt;
+&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Click on different cells in the &lt;span style=&quot; font-weight:600;&quot;&gt;Tree View&lt;/span&gt;. As you do, watch the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Selected JSON&amp;quot;&lt;/span&gt; section change (at the bottom-right of this widget). Pay extra attention to &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Selected JSON&amp;quot;&lt;/span&gt; when you click on the leftmost column (the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;Structure&amp;gt;&lt;/span&gt; column) of the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Tree View&amp;quot;&lt;/span&gt;.&lt;/li&gt;
+&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Double-click a cell with existing data in the &lt;span style=&quot; font-weight:600;&quot;&gt;Tree View&lt;/span&gt; and type in a new value. Notice that the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Selected JSON&amp;quot;&lt;/span&gt; output now shows your new value when you click on the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;lt;Structure&amp;gt;&lt;/span&gt; column.&lt;/li&gt;
+&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rearrange and/or remove items in the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Scalar Column Elements&amp;quot;&lt;/span&gt; list (at the middle-left of this widget). Click &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Set Scalar Columns&amp;quot;&lt;/span&gt; and see how the Tree View's structure changes.&lt;/li&gt;
+&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select a different (but non-custom) JSON document from the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;JSON Input&amp;quot;&lt;/span&gt; combo box (at the bottom-left of this widget). Repeat steps 1-4.&lt;/li&gt;
+&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;&amp;lt;Custom...&amp;gt;&amp;quot;&lt;/span&gt; from the &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;JSON Input&amp;quot;&lt;/span&gt; combo box. Type (or paste) your own JSON document into the text field below the combo box, then click &lt;span style=&quot; font-weight:600;&quot;&gt;&amp;quot;Set JSON&amp;quot;&lt;/span&gt;. Repeat steps 1-4.&lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::NoTextInteraction</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="gb_scalarColumns">
+       <property name="title">
+        <string>Scalar Columns</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="lb_discoveryMode">
+          <property name="text">
+           <string>Discovery Mode &lt;em&gt;(when setting a new JSON Input)&lt;/em&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>No Search</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Quick Search</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Comprehensive Search</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lb_scalarColumns">
+          <property name="text">
+           <string>Scalar Column Elements &lt;em&gt;(1 per line)&lt;/em&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="te_scalarColumns">
+          <property name="acceptRichText">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_setScalarColumns">
+          <property name="text">
+           <string>Set Scalar Columns</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="gb_jsonInput">
+       <property name="title">
+        <string>JSON Input</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_12">
+        <item>
+         <widget class="QComboBox" name="cb_jsonSource">
+          <item>
+           <property name="text">
+            <string>&lt;Custom...&gt;</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="te_json">
+          <property name="acceptRichText">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_setJson">
+          <property name="text">
+           <string>Set JSON</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QSplitter" name="spl_right">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QGroupBox" name="gb_treeView">
+       <property name="title">
+        <string>Tree View</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_11">
+        <item>
+         <widget class="QTreeView" name="treeView">
+          <property name="alternatingRowColors">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="gb_selection">
+       <property name="title">
+        <string>Selected JSON</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <item>
+         <widget class="QTextEdit" name="ter_treeView">
+          <property name="palette">
+           <palette>
+            <active>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>222</red>
+                <green>222</green>
+                <blue>222</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </active>
+            <inactive>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>222</red>
+                <green>222</green>
+                <blue>222</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </inactive>
+            <disabled>
+             <colorrole role="Base">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </disabled>
+           </palette>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
