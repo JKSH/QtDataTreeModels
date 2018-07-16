@@ -13,6 +13,18 @@
 //=================================
 // JsonTreeModelNode and subclasses
 //=================================
+/*!
+	\fn JsonTreeModelNode::setParent
+	\brief Makes this node a child of \a parent
+
+	\note Only a JsonTreeModelListNode can be a parent
+
+	\warning This function only updates this node's internal pointer to its parent. The caller is
+			 responsible for updating the child's registration manually.
+
+	\internal
+*/
+
 JsonTreeModelScalarNode::JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent),
 	m_value(value)
@@ -45,7 +57,7 @@ JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeMode
 
 		default: break;
 		}
-		addChild(childNode);
+		registerChild(childNode);
 	}
 }
 
@@ -58,11 +70,42 @@ JsonTreeModelListNode::value() const
 	return fullArray;
 }
 
+/*!
+	\brief Puts the \a child node under this node's hierarchy
+
+	\note Only the \a child's parent can call this function
+
+	\internal
+*/
 void
-JsonTreeModelListNode::addChild(JsonTreeModelNode* child)
+JsonTreeModelListNode::registerChild(JsonTreeModelNode* child)
 {
+	Q_ASSERT_X(child->parent() == this, "registerChild()", "Only a parent can register its own child");
 	m_childPositions[child] = m_childList.count();
 	m_childList << child;
+}
+
+/*!
+	\brief Removes the \a child node from this node's hierarchy
+
+	\note Only the \a child's parent can call this function
+
+	\internal
+*/
+void
+JsonTreeModelListNode::deregisterChild(JsonTreeModelNode* child)
+{
+	Q_ASSERT_X(child->parent() == this, "deregisterChild()", "Only a parent can deregister its own child");
+	auto i = m_childPositions.take(child);
+	m_childList.remove(i);
+
+	// ASSUMPTION: Registration/deregistration is infrequent, but lookups are very frequent. Thus, this O(n) loop is acceptable.
+	while (i < m_childList.count())
+	{
+		m_childPositions[ m_childList[i] ] = i;
+		++i;
+	}
+	// TODO: Add function to deregister multiple children simultaneously
 }
 
 JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
@@ -91,7 +134,7 @@ JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, J
 
 		default: continue;
 		}
-		addChild(childNode);
+		registerChild(childNode);
 		m_childListNodeNames[childNode] = key;
 	}
 }
@@ -116,8 +159,11 @@ JsonTreeModelNamedListNode::value() const
 JsonTreeModelWrapperNode::JsonTreeModelWrapperNode(JsonTreeModelNamedListNode* realNode) :
 	JsonTreeModelListNode(nullptr)
 {
-	addChild(realNode);
+	Q_ASSERT(realNode->parent() == nullptr);
+
+	// NOTE: Only a parent can register a child, so we must call setParent() before registerChild()
 	realNode->setParent(this);
+	registerChild(realNode);
 }
 
 
@@ -292,7 +338,7 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 			static_cast<JsonTreeModelNode*>(parent.internalPointer()) :
 			m_rootNode;
 
-	if (parentNode->type() == JsonTreeModelNode::Scalar)
+	if (parentNode == nullptr || parentNode->type() == JsonTreeModelNode::Scalar) // Short-circuit
 		return QModelIndex();
 
 	// ASSUMPTION: For sub-items, parent's column always == 0 and the parent is an array/object
@@ -337,7 +383,7 @@ int JsonTreeModel::rowCount(const QModelIndex& parent) const
 {
 	// NOTE: A QTreeView will try to probe the child count of all nodes, so we must check the node type.
 	auto node = parent.isValid() ? static_cast<JsonTreeModelNode*>(parent.internalPointer()) : m_rootNode;
-	if (node->type() == JsonTreeModelNode::Scalar)
+	if (node == nullptr || node->type() == JsonTreeModelNode::Scalar) // Short-circuit
 		return 0;
 
 	return static_cast<JsonTreeModelListNode*>(node)->childCount();
@@ -577,7 +623,11 @@ QJsonValue JsonTreeModel::json(const QModelIndex& index) const
 {
 	// Top-level
 	if (!index.isValid())
+	{
+		if (m_rootNode == nullptr)
+			return QJsonValue();
 		return m_rootNode->value();
+	}
 
 	// Not top-level
 	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
