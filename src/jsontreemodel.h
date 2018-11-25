@@ -188,7 +188,6 @@ public:
 	QStringList scalarColumns() const { return m_headers.mid(2); }
 
 private:
-	static QSet<QString> findScalarNames(const QJsonValue& data, bool comprehensive);
 	bool isEditable(const QModelIndex& index) const;
 
 	JsonTreeModelListNode* m_rootNode;

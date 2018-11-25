@@ -826,6 +826,9 @@ JsonTreeModel::json(const QModelIndex& index) const
 	return QJsonValue();
 }
 
+static QSet<QString>
+findScalarNames(const QJsonValue &data, bool comprehensive);
+
 /*!
 	\brief Sets the whole model's internal data structure to the given JSON \a array.
 
@@ -915,8 +918,8 @@ JsonTreeModel::setScalarColumns(const QStringList& columns)
 	endResetModel();
 }
 
-QSet<QString>
-JsonTreeModel::findScalarNames(const QJsonValue &data, bool comprehensive)
+static QSet<QString>
+findScalarNames(const QJsonValue &data, bool comprehensive)
 {
 	auto processArray = [](const QJsonArray& array, bool comprehensive) -> QSet<QString>
 	{
