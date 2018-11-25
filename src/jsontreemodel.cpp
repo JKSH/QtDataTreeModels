@@ -14,29 +14,111 @@
 // JsonTreeModelNode and subclasses
 //=================================
 /*!
-	\fn JsonTreeModelNode::setParent
-	\brief Makes this node a child of \a parent
+	\class JsonTreeModelNode
+	\brief JsonTreeModelNode is the base class for the internal data structure behind JsonTreeModel.
+*/
+/*!
+	\enum JsonTreeModelNode::Type
+	\brief This enum describes the type of data represented by a JsonTreeModelNode.
 
-	\note Only a JsonTreeModelListNode can be a parent
+	\sa type()
+*/
+/*!
+	\fn JsonTreeModelNode::JsonTreeModelNode
+	\brief Constructs a new node with the given \a parent.
 
-	\warning This function only updates this node's internal pointer to its parent. The caller is
-			 responsible for updating the child's registration manually.
+	\note Only a JsonTreeModelListNode (or one of its subclasses) can be a parent.
+*/
+/*!
+	\fn JsonTreeModelNode::~JsonTreeModelNode
+	\brief Frees the memory held by this node and its children.
 
-	\internal
+	\warning This node is not automatically removed from its parent's list of children.
+*/
+/*!
+	\fn JsonTreeModelNode* JsonTreeModelNode::parent
+	\brief Returns this node's parent.
+
+	\sa setParent()
+*/
+/*!
+	\fn void JsonTreeModelNode::setParent
+	\brief Makes this node a child of \a parent.
+
+	\note Only a JsonTreeModelListNode (or one of its subclasses) can be a parent.
+
+	\warning This function only updates this node's internal pointer to its parent. The caller
+			 must manually update the child's
+			 \link JsonTreeModelListNode::registerChild() registration\endlink.
+
+	\sa parent()
+*/
+/*!
+	\fn virtual QJsonValue JsonTreeModelNode::value
+	\brief Returns the JSON value represented by this node and its children (if any).
 */
 
+/*!
+	\class JsonTreeModelScalarNode
+	\brief JsonTreeModelScalarNode is the most basic element of a JsonTreeModel's internal data.
+
+	It represents a single scalar JSON value (nulls, Booleans, numbers, and strings).
+
+	\note JsonTreeModelScalarNode cannot be the \link JsonTreeModelNode::parent() parent \endlink of another node.
+*/
+/*!
+	\brief Constructs a node under the specified \a parent to represent the specified scalar \a value.
+*/
 JsonTreeModelScalarNode::JsonTreeModelScalarNode(const QJsonValue& value, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent),
 	m_value(value)
 {}
 
-JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeModelNode* parent) :
+/*!
+	\fn Type JsonTreeModelScalarNode::type
+	\brief Returns JsonTreeModelNode::Scalar
+*/
+/*!
+	\fn void JsonTreeModelScalarNode::setValue
+	\brief Replaces the \a value represented by this node.
+
+	\sa value()
+*/
+/*!
+	\fn QJsonValue JsonTreeModelScalarNode::value
+	\brief Returns the scalar JSON value represented by this node.
+
+	\sa setValue()
+*/
+
+/*!
+	\class JsonTreeModelListNode
+	\brief JsonTreeModelListNode represents a JSON structure (namely an array or an object)
+		   and provides the backbone of the tree model.
+
+	This class can have \e children. Child nodes manifest as child rows in the
+	JsonTreeModel.
+
+	JSON objects are best represented as a JsonTreeModelNamedListNode.
+*/
+/*!
+	\fn JsonTreeModelListNode::JsonTreeModelListNode(JsonTreeModelNode* parent)
+	\brief Constructs an empty JsonTreeModelListNode under the specified \a parent.
+
+	The new node can be populated later.
+*/
+/*!
+	\brief Constructs a node under the specified \a parent to represent the specified JSON \a array.
+
+	All \a array elements will be placed within child nodes and \link registerChild() registered\endlink.
+*/
+JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& array, JsonTreeModelNode* parent) :
 	JsonTreeModelNode(parent)
 {
 	JsonTreeModelNode* childNode;
-	for (int i = 0; i < arr.count(); ++i)
+	for (int i = 0; i < array.count(); ++i)
 	{
-		const auto& child = arr[i];
+		const auto& child = array[i];
 
 		switch (child.type())
 		{
@@ -61,6 +143,36 @@ JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& arr, JsonTreeMode
 	}
 }
 
+/*!
+	\fn JsonTreeModelNode* JsonTreeModelListNode::childAt
+	\brief Returns the child node at index \a i.
+
+	\warning The caller must ensure that 0 <= \a i < childCount()
+
+	\sa childPosition()
+*/
+/*!
+	\fn int JsonTreeModelListNode::childCount
+	\brief Returns the number of child nodes under this row.
+
+	This is equivalent to the number of \link JsonTreeModel::rowCount() rows \endlink
+	in the JsonTreeModel where this node is the parent QModelIndex.
+*/
+/*!
+	\fn int JsonTreeModelListNode::childPosition
+	\brief Returns index number of the specified \a child, or
+	-1 if the \a child does not belong to this node.
+
+	\sa childAt()
+*/
+/*!
+	\fn Type JsonTreeModelListNode::type
+	\brief Returns JsonTreeModelNode::Array.
+*/
+
+/*!
+	\brief Returns the JSON structure (array or object) represented by this node.
+*/
 QJsonValue
 JsonTreeModelListNode::value() const
 {
@@ -74,8 +186,6 @@ JsonTreeModelListNode::value() const
 	\brief Puts the \a child node under this node's hierarchy
 
 	\note Only the \a child's parent can call this function
-
-	\internal
 */
 void
 JsonTreeModelListNode::registerChild(JsonTreeModelNode* child)
@@ -89,8 +199,6 @@ JsonTreeModelListNode::registerChild(JsonTreeModelNode* child)
 	\brief Removes the \a child node from this node's hierarchy
 
 	\note Only the \a child's parent can call this function
-
-	\internal
 */
 void
 JsonTreeModelListNode::deregisterChild(JsonTreeModelNode* child)
@@ -108,13 +216,28 @@ JsonTreeModelListNode::deregisterChild(JsonTreeModelNode* child)
 	// TODO: Add function to deregister multiple children simultaneously
 }
 
-JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent) :
+/*!
+	\class JsonTreeModelNamedListNode
+	\brief JsonTreeModelNamedListNode represents a JSON object.
+
+	Scalar members of this node appear in named
+	\link JsonTreeModel::scalarColumns() scalar columns\endlink in the JsonTreeModel.
+
+	Non-scalar members of this node (arrays and objects) appear as child rows in the JsonTreeModel.
+
+	If this node represents a top-level object of a JSON document and it contains scalar
+	members, then this node must be wrapped in a JsonTreeModelWrapperNode.
+*/
+/*!
+	\brief Constructs a node under the specified \a parent to represent the specified JSON \a object.
+*/
+JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& object, JsonTreeModelNode* parent) :
 	JsonTreeModelListNode(parent)
 {
 	JsonTreeModelNode* childNode;
-	for (const QString& key : obj.keys())
+	for (const QString& key : object.keys())
 	{
-		const auto& child = obj[key];
+		const auto& child = object[key];
 		switch (child.type())
 		{
 		case QJsonValue::Null:
@@ -139,6 +262,43 @@ JsonTreeModelNamedListNode::JsonTreeModelNamedListNode(const QJsonObject& obj, J
 	}
 }
 
+/*!
+	\fn QString JsonTreeModelNamedListNode::childListNodeName
+	\brief
+*/
+/*!
+	\fn int JsonTreeModelNamedListNode::namedScalarCount
+	\brief Returns the number of scalar elements within this node.
+
+	In the JsonTreeModel, these are the elements that appear under the
+	model's \link JsonTreeModel::scalarColumns() scalar columns\endlink.
+*/
+/*!
+	\fn QJsonValue JsonTreeModelNamedListNode::namedScalarValue
+	\brief Returns the scalar element in this node which has the given \a name.
+
+	If the underlying JSON object has no member with the given \a name
+	(or if the member is non-scalar), this function returns an undefined
+	QJsonValue.
+
+	\sa setNamedScalarValue()
+*/
+/*!
+	\fn void JsonTreeModelNamedListNode::setNamedScalarValue
+	\brief Adds or updates a scalar element of the JSON object represented
+		   by this node.
+
+	\sa namedScalarValue()
+*/
+/*!
+	\fn Type JsonTreeModelNamedListNode::type
+	\brief Returns JsonTreeModelNode::Object
+*/
+/*!
+	\fn QJsonValue JsonTreeModelNamedListNode::value
+	\brief Returns the JSON object represented by this node.
+*/
+
 QJsonValue
 JsonTreeModelNamedListNode::value() const
 {
@@ -150,6 +310,11 @@ JsonTreeModelNamedListNode::value() const
 	return fullObject;
 }
 
+/*!
+	\class JsonTreeModelWrapperNode
+	\brief The JsonTreeModelWrapperNode class wraps a top-level JsonTreeModelNamedListNode,
+		   to allow its scalar members to be shown.
+*/
 /*!
 	\brief Constructs a wrapper for \a realNode and takes ownership of it.
 
@@ -165,6 +330,12 @@ JsonTreeModelWrapperNode::JsonTreeModelWrapperNode(JsonTreeModelNamedListNode* r
 	realNode->setParent(this);
 	registerChild(realNode);
 }
+
+/*!
+	\fn QJsonValue JsonTreeModelWrapperNode::value
+
+	\brief Returns the JSON object represented by the wrapped node.
+*/
 
 
 //=================================
