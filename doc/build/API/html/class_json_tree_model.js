@@ -6,7 +6,7 @@ var class_json_tree_model =
       [ "ComprehensiveSearch", "class_json_tree_model.html#a3b4fb30102963c28fe88135f0a7b3f96ac88e50476b17e694b524215f4a52ee2c", null ]
     ] ],
     [ "JsonTreeModel", "class_json_tree_model.html#a0e83869bef4ffdbf3a716e5b30c3a1bf", null ],
-    [ "~JsonTreeModel", "class_json_tree_model.html#aa727dca0c93d6a6dd5ff01fad68b4d13", null ],
+    [ "~JsonTreeModel", "class_json_tree_model.html#acaaa6155ff360d48f2f4e9a9f1a47238", null ],
     [ "columnCount", "class_json_tree_model.html#af6babdf3900c4ec95de4299ab521b5c6", null ],
     [ "data", "class_json_tree_model.html#a04c8dbb67291c45667402ea530f110c1", null ],
     [ "flags", "class_json_tree_model.html#ad172eccae4db7692b66a40a173c3b894", null ],
@@ -15,7 +15,7 @@ var class_json_tree_model =
     [ "json", "class_json_tree_model.html#af73566a192855839f2c922530c2cb0d2", null ],
     [ "parent", "class_json_tree_model.html#a8e2338667b6c2c1261ee8b311f243168", null ],
     [ "rowCount", "class_json_tree_model.html#ab67034bddba3f889adf08516f1bf84f7", null ],
-    [ "scalarColumns", "class_json_tree_model.html#ac7c2cfd5cf413882955dcb9f90a6333d", null ],
+    [ "scalarColumns", "class_json_tree_model.html#a14f8a49f5e301b17d79bd930febdfbb7", null ],
     [ "setData", "class_json_tree_model.html#a6eb6ce8a5305c73b5403b96af698e213", null ],
     [ "setJson", "class_json_tree_model.html#acd08426d0359657c1cba01c578c21442", null ],
     [ "setJson", "class_json_tree_model.html#a1e1d3c213ff8cd235552269ebb9f5e1d", null ],
