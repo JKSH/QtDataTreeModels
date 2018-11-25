@@ -926,7 +926,9 @@ findScalarNames(const QJsonValue &data, bool comprehensive)
 		QSet<QString> names;
 		for (const auto element : array)
 		{
-			names += findScalarNames(element, comprehensive);
+			if (element.type() == QJsonValue::Object || element.type() == QJsonValue::Array)
+				names += findScalarNames(element, comprehensive);
+
 			if (!comprehensive)
 				break; // Non-comprehensive searches only look at the first array element
 		}
