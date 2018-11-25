@@ -580,7 +580,7 @@ JsonTreeModel::columnCount(const QModelIndex& parent) const
 {
 	Q_UNUSED(parent);
 
-	// ASSUMPTION: The headers list includes Struct and Scalar columns
+	// NOTE: The headers list includes Struct and Scalar columns
 	return m_headers.count();
 }
 
@@ -659,7 +659,7 @@ JsonTreeModel::setData(const QModelIndex& index, const QVariant& value, int role
 			|| !isEditable(index) // NOTE: isEditable() checks for index validity
 			|| data(index, role) == value )
 	{
-		return false;
+		return false; // TODO: Check if setting an indentical value should return true or false
 	}
 
 	QJsonValue newData;

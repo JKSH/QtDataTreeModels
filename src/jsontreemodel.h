@@ -153,6 +153,7 @@ class JsonTreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
+	// TODO: Add flag to sort the keys, or leave them in the order of discovery
 	enum ScalarColumnSearchMode
 	{
 		NoSearch,
@@ -183,6 +184,8 @@ public:
 	void setJson(const QJsonArray& array, ScalarColumnSearchMode searchMode = QuickSearch);
 	void setJson(const QJsonObject& object, ScalarColumnSearchMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
+
+	// TODO: Decide if the json()/setJson() API should be symmetrical or not
 
 	void setScalarColumns(const QStringList& columns);
 	QStringList scalarColumns() const { return m_headers.mid(2); }
