@@ -477,7 +477,7 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 {}
 
 /*!
-	\fn JsonTreeModel::~JsonTreeModel()
+	\fn JsonTreeModel::~JsonTreeModel
 
 	\brief Destroys the JsonTreeModel and frees its memory.
 */
@@ -893,7 +893,7 @@ JsonTreeModel::setJson(const QJsonObject& object, ScalarColumnSearchMode searchM
 }
 
 /*!
-	\fn JsonTreeModel::scalarColumns
+	\fn QStringList JsonTreeModel::scalarColumns
 	\brief Returns the names of the JSON objects' scalar members that are shown by the model.
 
 	\sa setScalarColumns()
