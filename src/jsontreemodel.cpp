@@ -662,7 +662,7 @@ JsonTreeModel::setData(const QModelIndex& index, const QVariant& value, int role
 	}
 
 	QJsonValue newData;
-	switch (value.type())
+	switch (  static_cast<QMetaType::Type>( value.type() )  )
 	{
 	case QMetaType::Void:
 		// newData remains null
