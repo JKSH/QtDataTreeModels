@@ -10,7 +10,6 @@
 #define JSONTREEMODEL_H
 
 #include <QAbstractItemModel>
-
 #include <QJsonObject>
 #include <QJsonArray>
 
@@ -76,7 +75,7 @@ public:
 	JsonTreeModelListNode(JsonTreeModelNode* parent) : JsonTreeModelNode(parent) {}
 	JsonTreeModelListNode(const QJsonArray& array, JsonTreeModelNode* parent);
 
-	~JsonTreeModelListNode()
+	~JsonTreeModelListNode() override
 	{
 		// TODO: Tell parent to remove this child from its list? Only if we do partial deletions
 		qDeleteAll(m_childList);
@@ -154,6 +153,7 @@ class JsonTreeModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
+	// TODO: Add flag to sort the keys, or leave them in the order of discovery
 	enum ScalarColumnSearchMode
 	{
 		NoSearch,
@@ -162,7 +162,7 @@ public:
 	};
 
 	explicit JsonTreeModel(QObject* parent = nullptr);
-	~JsonTreeModel() { delete m_rootNode; }
+	~JsonTreeModel() override { delete m_rootNode; }
 
 	// Header:
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -185,11 +185,12 @@ public:
 	void setJson(const QJsonObject& object, ScalarColumnSearchMode searchMode = QuickSearch);
 	QJsonValue json(const QModelIndex& index = QModelIndex()) const;
 
+	// TODO: Decide if the json()/setJson() API should be symmetrical or not
+
 	void setScalarColumns(const QStringList& columns);
 	QStringList scalarColumns() const { return m_headers.mid(2); }
 
 private:
-	static QSet<QString> findScalarNames(const QJsonValue& data, bool comprehensive);
 	bool isEditable(const QModelIndex& index) const;
 
 	JsonTreeModelListNode* m_rootNode;
