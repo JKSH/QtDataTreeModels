@@ -8,6 +8,7 @@
 
 #include "jsontreemodel.h"
 #include <QJsonArray>
+//#include <QFont>
 #include <QSet>
 
 //=================================
@@ -603,6 +604,9 @@ JsonTreeModel::data(const QModelIndex& index, int role) const
 	// ASSUMPTION: The process of generating this index has already validated the data
 	if (!index.isValid())
 		return QVariant();
+
+//	if (role == Qt::FontRole && index.column() == 0)
+//		return QFont("Courier", -1, -1, true);
 
 	if (role == Qt::DisplayRole || role == Qt::EditRole)
 	{
