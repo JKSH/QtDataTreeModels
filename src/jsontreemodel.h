@@ -30,9 +30,9 @@ class JsonTreeModelNode
 {
 public:
 	enum Type {
-		Scalar,
-		Object,
-		Array
+		Scalar, ///< Represents scalar JSON values (nulls, Booleans, numbers, and strings).
+		Object, ///< Represents JSON objects.
+		Array   ///< Represents JSON arrays.
 	};
 
 	JsonTreeModelNode(JsonTreeModelNode* parent) : m_parent(parent) {}
@@ -74,7 +74,7 @@ class JsonTreeModelListNode : public JsonTreeModelNode
 {
 public:
 	JsonTreeModelListNode(JsonTreeModelNode* parent) : JsonTreeModelNode(parent) {}
-	JsonTreeModelListNode(const QJsonArray& arr, JsonTreeModelNode* parent);
+	JsonTreeModelListNode(const QJsonArray& array, JsonTreeModelNode* parent);
 
 	~JsonTreeModelListNode()
 	{
@@ -108,7 +108,7 @@ private:
 class JsonTreeModelNamedListNode : public JsonTreeModelListNode
 {
 public:
-	JsonTreeModelNamedListNode(const QJsonObject& obj, JsonTreeModelNode* parent);
+	JsonTreeModelNamedListNode(const QJsonObject& object, JsonTreeModelNode* parent);
 
 	inline QString childListNodeName(JsonTreeModelNode* child) const
 	{ return m_childListNodeNames[child]; }
