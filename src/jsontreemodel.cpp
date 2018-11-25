@@ -137,7 +137,8 @@ JsonTreeModelListNode::JsonTreeModelListNode(const QJsonArray& array, JsonTreeMo
 			childNode = new JsonTreeModelNamedListNode(child.toObject(), this);
 			break;
 
-		default: break;
+		case QJsonValue::Undefined:
+			continue; // Shouldn't happen
 		}
 		registerChild(childNode);
 	}
