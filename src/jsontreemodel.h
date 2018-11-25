@@ -10,7 +10,6 @@
 #define JSONTREEMODEL_H
 
 #include <QAbstractItemModel>
-
 #include <QJsonObject>
 #include <QJsonArray>
 

@@ -439,7 +439,6 @@ JsonTreeModelWrapperNode::JsonTreeModelWrapperNode(JsonTreeModelNamedListNode* r
 	\image html example_tree.png
 */
 
-
 /*!
 	\enum JsonTreeModel::ScalarColumnSearchMode
 	\brief This enum controls how setJson() updates the model's column headers.
@@ -486,7 +485,8 @@ JsonTreeModel::JsonTreeModel(QObject* parent) :
 	Horizontal headers show the text of scalarColumns() for the third column onwards.
 	Vertical headers show the text of column 0.
 */
-QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant
+JsonTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (role == Qt::DisplayRole)
 	{
@@ -499,7 +499,8 @@ QVariant JsonTreeModel::headerData(int section, Qt::Orientation orientation, int
 	return QAbstractItemModel::headerData(section, orientation, role);
 }
 
-QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex
+JsonTreeModel::index(int row, int column, const QModelIndex& parent) const
 {
 	// NOTE: m_headers also takes the struct column and scalar column into account
 	if (column >= m_headers.count() || column < 0)
@@ -522,7 +523,8 @@ QModelIndex JsonTreeModel::index(int row, int column, const QModelIndex& parent)
 	return createIndex(row, column, childRow);
 }
 
-QModelIndex JsonTreeModel::parent(const QModelIndex& index) const
+QModelIndex
+JsonTreeModel::parent(const QModelIndex& index) const
 {
 	auto node = static_cast<JsonTreeModelNode*>(index.internalPointer());
 	if (node)
@@ -550,7 +552,8 @@ QModelIndex JsonTreeModel::parent(const QModelIndex& index) const
 
 	\sa columnCount()
 */
-int JsonTreeModel::rowCount(const QModelIndex& parent) const
+int
+JsonTreeModel::rowCount(const QModelIndex& parent) const
 {
 	// NOTE: A QTreeView will try to probe the child count of all nodes, so we must check the node type.
 	auto node = parent.isValid() ? static_cast<JsonTreeModelNode*>(parent.internalPointer()) : m_rootNode;
@@ -571,7 +574,8 @@ int JsonTreeModel::rowCount(const QModelIndex& parent) const
 
 	\sa rowCount(), scalarColumns()
 */
-int JsonTreeModel::columnCount(const QModelIndex& parent) const
+int
+JsonTreeModel::columnCount(const QModelIndex& parent) const
 {
 	Q_UNUSED(parent);
 
@@ -592,7 +596,8 @@ int JsonTreeModel::columnCount(const QModelIndex& parent) const
 
 	\sa setData(), json()
 */
-QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
+QVariant
+JsonTreeModel::data(const QModelIndex& index, int role) const
 {
 	// ASSUMPTION: The process of generating this index has already validated the data
 	if (!index.isValid())
@@ -646,7 +651,8 @@ QVariant JsonTreeModel::data(const QModelIndex& index, int role) const
 /*
 	While setJson() updates the data for the entire model, setData() only updates the data for a single
 */
-bool JsonTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool
+JsonTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if ( role != Qt::EditRole
 			|| !isEditable(index) // NOTE: isEditable() checks for index validity
@@ -712,13 +718,13 @@ bool JsonTreeModel::setData(const QModelIndex& index, const QVariant& value, int
 	return true;
 }
 
-Qt::ItemFlags JsonTreeModel::flags(const QModelIndex& index) const
+Qt::ItemFlags
+JsonTreeModel::flags(const QModelIndex& index) const
 {
 	if (isEditable(index))
 		return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 	return QAbstractItemModel::flags(index);
 }
-
 
 /*!
 	\brief Returns the JSON value under the given \a index.
@@ -790,7 +796,8 @@ Qt::ItemFlags JsonTreeModel::flags(const QModelIndex& index) const
 
 	\sa setJson(), data()
 */
-QJsonValue JsonTreeModel::json(const QModelIndex& index) const
+QJsonValue
+JsonTreeModel::json(const QModelIndex& index) const
 {
 	// Top-level
 	if (!index.isValid())
@@ -941,7 +948,6 @@ JsonTreeModel::findScalarNames(const QJsonValue &data, bool comprehensive)
 				names += i.key(); // This is a scalar
 		}
 	}
-
 	return names;
 }
 
@@ -961,5 +967,4 @@ JsonTreeModel::isEditable(const QModelIndex& index) const
 	return !(  node->type() == JsonTreeModelNode::Array
 			|| ( node->type() == JsonTreeModelNode::Scalar && index.column() != 1 )
 			|| ( node->type() == JsonTreeModelNode::Object && index.column() <= 1 )  );
-
 }
