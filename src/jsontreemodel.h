@@ -75,7 +75,7 @@ public:
 	JsonTreeModelListNode(JsonTreeModelNode* parent) : JsonTreeModelNode(parent) {}
 	JsonTreeModelListNode(const QJsonArray& array, JsonTreeModelNode* parent);
 
-	~JsonTreeModelListNode()
+	~JsonTreeModelListNode() override
 	{
 		// TODO: Tell parent to remove this child from its list? Only if we do partial deletions
 		qDeleteAll(m_childList);
@@ -162,7 +162,7 @@ public:
 	};
 
 	explicit JsonTreeModel(QObject* parent = nullptr);
-	~JsonTreeModel() { delete m_rootNode; }
+	~JsonTreeModel() override { delete m_rootNode; }
 
 	// Header:
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
