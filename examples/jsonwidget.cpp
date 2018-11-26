@@ -1,10 +1,5 @@
-/*\
- * Copyright (c) 2018 Sze Howe Koh
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-\*/
+// Copyright (c) 2018 Sze Howe Koh
+// This code is licensed under the MIT license (see LICENSE.MIT for details)
 
 #include "jsonwidget.h"
 #include "ui_jsonwidget.h"
