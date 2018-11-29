@@ -1,5 +1,5 @@
-Qt Data Tree Model
-==================
+Qt Data Tree Models
+===================
 
 This library provides a flexible way to display hierarchical data in a Qt C++
 model. The current implementation supports JSON documents; it is quite feasible
@@ -105,6 +105,6 @@ Licensing
 ---------
 Copyright (c) 2018 Sze Howe Koh <<szehowe.koh@gmail.com>>
 
-The Qt Data Tree Model library is published under the Mozilla Public License
+The Qt Data Tree Models library is published under the Mozilla Public License
 v2.0 (see [LICENSE.MPLv2](LICENSE.MPLv2)), while examples are published under
 the MIT License (see [examples/LICENSE.MIT](examples/LICENSE.MIT)).
