@@ -94,8 +94,7 @@ from the [examples/](examples) folder.
 
 Documentation
 -------------
-* To use this library, see _doc/build/API/html/index.html_
-* To hack this library, see _doc/build/Implementation/html/index.html_
+See [https://jksh.github.io/QtDataTreeModels/](https://jksh.github.io/QtDataTreeModels/).
 
 Usage
 -----
